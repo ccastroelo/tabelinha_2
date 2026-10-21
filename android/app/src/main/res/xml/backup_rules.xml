@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup automático do Android 11 e anterior (android:fullBackupContent).
+  Só o que o app guarda via shared_preferences: início/duração do ciclo,
+  histórico com anotações e aceite dos termos. Todo o resto fica de fora.
+  Android 12+ usa data_extraction_rules.xml: mantenha os dois iguais.
+-->
+<full-backup-content>
+    <include domain="sharedpref" path="FlutterSharedPreferences.xml" />
+</full-backup-content>

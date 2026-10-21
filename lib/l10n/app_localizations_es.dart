@@ -1,0 +1,164 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Spanish Castilian (`es`).
+class AppLocalizationsEs extends AppLocalizations {
+  AppLocalizationsEs([String locale = 'es']) : super(locale);
+
+  @override
+  String get appTitle => 'Calendario de Fertilidad';
+
+  @override
+  String get helpTitle => 'Ayuda';
+
+  @override
+  String get historyTitle => 'Registros';
+
+  @override
+  String get notesTitle => 'Notas';
+
+  @override
+  String get shareTooltip => 'Compartir calendario';
+
+  @override
+  String get shareError => 'No se pudo compartir.';
+
+  @override
+  String get today => 'Hoy';
+
+  @override
+  String get goToToday => 'Ir a hoy';
+
+  @override
+  String get previousMonth => 'Mes anterior';
+
+  @override
+  String get nextMonth => 'Mes siguiente';
+
+  @override
+  String get menstruation => 'Menstruación';
+
+  @override
+  String get fertileWindow => 'Período fértil';
+
+  @override
+  String get ovulation => 'Ovulación';
+
+  @override
+  String get yourCycle => 'Tu ciclo';
+
+  @override
+  String get cycleStart => 'Inicio del ciclo';
+
+  @override
+  String get cycleLength => 'Duración del ciclo';
+
+  @override
+  String get periodLength => 'Duración de la menstruación';
+
+  @override
+  String daysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días',
+      one: '1 día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String inDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'en $count días',
+      one: 'mañana',
+      zero: 'hoy',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String decreaseValue(String label) {
+    return 'Disminuir: $label';
+  }
+
+  @override
+  String increaseValue(String label) {
+    return 'Aumentar: $label';
+  }
+
+  @override
+  String get setupTitle => 'Empecemos';
+
+  @override
+  String get setupBody =>
+      'Indica el primer día de tu última menstruación para ver el calendario.';
+
+  @override
+  String get setupAction => 'Indicar fecha';
+
+  @override
+  String dayOfCycle(int day) {
+    return 'Día $day del ciclo';
+  }
+
+  @override
+  String get nextPeriod => 'Próxima menstruación';
+
+  @override
+  String get estimateNote =>
+      'Cálculo estimado. No lo uses como método anticonceptivo.';
+
+  @override
+  String get registerMonth => 'Registrar menstruación del mes';
+
+  @override
+  String get registeredSnack => 'Menstruación guardada en el historial.';
+
+  @override
+  String get alreadyRegisteredSnack => 'Este mes ya estaba en el historial.';
+
+  @override
+  String get viewAction => 'Ver';
+
+  @override
+  String get historyEmptyTitle => 'Aún no hay registros';
+
+  @override
+  String get historyEmptyBody =>
+      'En la pantalla de inicio, toca “Registrar menstruación del mes” para guardar un período aquí.';
+
+  @override
+  String get recordRemoved => 'Registro eliminado';
+
+  @override
+  String get undo => 'Deshacer';
+
+  @override
+  String get deleteRecord => 'Eliminar registro';
+
+  @override
+  String get notesHint => 'Escribe aquí tus notas…';
+
+  @override
+  String get termsTitle => 'Atención';
+
+  @override
+  String get termsBody =>
+      'El \"Calendario de Fertilidad\" no debe ser usado como un método anticonceptivo. El período de ovulación puede variar de mujer a mujer, además de que existen diversos factores que también alteran la duración del ciclo, tales como: ansiedad, estrés, enfermedades, entre otros.\n\nPor lo tanto, el método es recomendado para la mujer que quiere embarazarse, y no para aquella que pretende evitar el embarazo. Además de eso, su cálculo es solamente una estimación.';
+
+  @override
+  String get termsAgree => 'Estoy consciente';
+
+  @override
+  String get termsContinue => 'Continuar';
+
+  @override
+  String get helpBody =>
+      'El \"Calendario de Fertilidad\" es un método usado para tratar de prever los períodos fértiles e infértiles de una mujer. Con él es posible estimar las fechas en las que hay mayor o menor probabilidad de embarazo en caso de relación sexual.\n\nMientras tanto, al contrario de lo que piensa la mayoría de las personas, el calendario de fertilidad no debe ser usado como medio anticonceptivo, pero puede ser usado como una óptima herramienta para quien quiere quedar embarazada. Sin embargo, el método de embarazarse usando el calendario de fertilidad todavía es algo muy confuso para la mayoría de las mujeres.\n\nEl método provee, a través de cálculos estimados, la probable fecha de la ovulación y los períodos más y menos propicios para embarazarse, basado en la fecha de la última ovulación y en la cantidad de días del ciclo menstrual.\n\nNormalmente la ovulación ocurre en el medio del ciclo menstrual. Así, por ejemplo, en un ciclo de 28 días, la ovulación ocurrirá entre el 12º y el 15º día a contar del primer día de la menstruación anterior. Debido a posibles variaciones de la ovulación, así como tiempo de vida de los espermatozoides, el período fértil es considerado de 4 días antes a 4 días después del día probable, totalizando 9 días.\n\nEn algunas situaciones, donde el ciclo menstrual no sigue una regularidad, el calendario de fertilidad no debe ser utilizado.\n\nComo los casos de:\n• Adolescentes, donde es raro que haya un ciclo regular.\n• Mujeres con ciclo menstrual irregular.\n• Mujeres con alteraciones hormonales, emocionales, o aun alimentarias.\n\nSe nota por lo tanto, que el calendario de fertilidad no es un método confiable como anticonceptivo. Además de eso, existen casos de mujeres que pueden quedar embarazadas fuera del período fértil, aun durante la menstruación.\n\nEs importante recordar que este método no previene el SIDA ni otras enfermedades de transmisión sexual.';
+}

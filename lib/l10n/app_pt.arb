@@ -1,0 +1,60 @@
+{
+  "@@locale": "pt",
+
+  "appTitle": "Tabelinha",
+  "helpTitle": "Ajuda",
+  "historyTitle": "Registros",
+  "notesTitle": "Anotações",
+  "shareTooltip": "Compartilhar calendário",
+  "shareError": "Não foi possível compartilhar.",
+
+  "today": "Hoje",
+  "goToToday": "Ir para hoje",
+  "previousMonth": "Mês anterior",
+  "nextMonth": "Próximo mês",
+
+  "menstruation": "Menstruação",
+  "fertileWindow": "Período fértil",
+  "ovulation": "Ovulação",
+
+  "yourCycle": "Seu ciclo",
+  "cycleStart": "Início do ciclo",
+  "cycleLength": "Duração do ciclo",
+  "periodLength": "Duração da menstruação",
+
+  "daysCount": "{count, plural, =1{1 dia} other{{count} dias}}",
+  "@daysCount": { "placeholders": { "count": { "type": "int" } } },
+  "inDays": "{count, plural, =0{hoje} =1{amanhã} other{em {count} dias}}",
+  "@inDays": { "placeholders": { "count": { "type": "int" } } },
+  "decreaseValue": "Diminuir: {label}",
+  "@decreaseValue": { "placeholders": { "label": { "type": "String" } } },
+  "increaseValue": "Aumentar: {label}",
+  "@increaseValue": { "placeholders": { "label": { "type": "String" } } },
+
+  "setupTitle": "Vamos começar",
+  "setupBody": "Informe o primeiro dia da sua última menstruação para ver o calendário.",
+  "setupAction": "Informar data",
+  "dayOfCycle": "Dia {day} do ciclo",
+  "@dayOfCycle": { "placeholders": { "day": { "type": "int" } } },
+  "nextPeriod": "Próxima menstruação",
+  "estimateNote": "Cálculo estimado. Não use como método contraceptivo.",
+
+  "registerMonth": "Registrar menstruação do mês",
+  "registeredSnack": "Menstruação registrada no histórico.",
+  "alreadyRegisteredSnack": "Este mês já estava no histórico.",
+  "viewAction": "Ver",
+
+  "historyEmptyTitle": "Nenhum registro ainda",
+  "historyEmptyBody": "Na tela inicial, toque em “Registrar menstruação do mês” para guardar um período aqui.",
+  "recordRemoved": "Registro removido",
+  "undo": "Desfazer",
+  "deleteRecord": "Excluir registro",
+  "notesHint": "Escreva aqui suas anotações…",
+
+  "termsTitle": "Atenção",
+  "termsBody": "A \"tabelinha\" não deve ser usada como um método contraceptivo. O período de ovulação pode variar de mulher para mulher, além de existirem diversos fatores que também alteram a duração do ciclo, tais como: ansiedade, estresse, doenças, entre outros.\n\nPortanto, o método é recomendado à mulher que quer engravidar, e não para aquela que pretende evitar a gravidez. Além disso, seu cálculo é apenas uma estimativa.",
+  "termsAgree": "Estou ciente",
+  "termsContinue": "Continuar",
+
+  "helpBody": "A \"tabelinha\" é um método usado para tentar prever os períodos férteis e inférteis de uma mulher. Através dela é possível estimar as datas onde há maior ou menor probabilidade de gravidez em caso de relação sexual.\n\nNo entanto, ao contrário que a maioria das pessoas pensa, a tabelinha não deve ser usada como meio contraceptivo, mas pode ser usada como ótima ferramenta para quem busca engravidar. Porém, o método de engravidar usando a tabelinha ainda é algo muito confuso para a maioria das mulheres.\n\nO método fornece, através de cálculos estimados, a provável data da ovulação e os períodos mais e menos propícios para engravidar, com base na data da última ovulação e na quantidade de dias do ciclo menstrual.\n\nNormalmente a ovulação ocorre no meio do ciclo menstrual. Assim, por exemplo, em um ciclo de 28 dias, a ovulação ocorrerá entre o 12º e o 15º dias a contar do primeiro dia da menstruação anterior. Devido a possíveis variações da ovulação, bem como tempo de vida dos espermatozoides, o período fértil é considerado de 4 dias antes a 4 dias depois do dia provável, totalizando 9 dias.\n\nEm algumas situações, onde o ciclo menstrual não segue uma regularidade, a tabelinha não deve ser utilizada.\nComo os casos de:\n• Adolescentes, onde é raro haver um ciclo regular.\n• Mulheres com ciclo menstrual desregulado.\n• Mulheres com alterações hormonais, emocionais, ou mesmo alimentares.\n\nPercebe-se então, que a tabelinha não é um método confiável como contraceptivo. Além disso, existem casos de mulheres que podem engravidar fora do período fértil, mesmo durante a menstruação.\n\nÉ importante lembrar que este método não previne a AIDS nem outras DSTs."
+}

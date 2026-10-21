@@ -1,0 +1,55 @@
+{
+  "@@locale": "es",
+
+  "appTitle": "Calendario de Fertilidad",
+  "helpTitle": "Ayuda",
+  "historyTitle": "Registros",
+  "notesTitle": "Notas",
+  "shareTooltip": "Compartir calendario",
+  "shareError": "No se pudo compartir.",
+
+  "today": "Hoy",
+  "goToToday": "Ir a hoy",
+  "previousMonth": "Mes anterior",
+  "nextMonth": "Mes siguiente",
+
+  "menstruation": "Menstruación",
+  "fertileWindow": "Período fértil",
+  "ovulation": "Ovulación",
+
+  "yourCycle": "Tu ciclo",
+  "cycleStart": "Inicio del ciclo",
+  "cycleLength": "Duración del ciclo",
+  "periodLength": "Duración de la menstruación",
+
+  "daysCount": "{count, plural, =1{1 día} other{{count} días}}",
+  "inDays": "{count, plural, =0{hoy} =1{mañana} other{en {count} días}}",
+  "decreaseValue": "Disminuir: {label}",
+  "increaseValue": "Aumentar: {label}",
+
+  "setupTitle": "Empecemos",
+  "setupBody": "Indica el primer día de tu última menstruación para ver el calendario.",
+  "setupAction": "Indicar fecha",
+  "dayOfCycle": "Día {day} del ciclo",
+  "nextPeriod": "Próxima menstruación",
+  "estimateNote": "Cálculo estimado. No lo uses como método anticonceptivo.",
+
+  "registerMonth": "Registrar menstruación del mes",
+  "registeredSnack": "Menstruación guardada en el historial.",
+  "alreadyRegisteredSnack": "Este mes ya estaba en el historial.",
+  "viewAction": "Ver",
+
+  "historyEmptyTitle": "Aún no hay registros",
+  "historyEmptyBody": "En la pantalla de inicio, toca “Registrar menstruación del mes” para guardar un período aquí.",
+  "recordRemoved": "Registro eliminado",
+  "undo": "Deshacer",
+  "deleteRecord": "Eliminar registro",
+  "notesHint": "Escribe aquí tus notas…",
+
+  "termsTitle": "Atención",
+  "termsBody": "El \"Calendario de Fertilidad\" no debe ser usado como un método anticonceptivo. El período de ovulación puede variar de mujer a mujer, además de que existen diversos factores que también alteran la duración del ciclo, tales como: ansiedad, estrés, enfermedades, entre otros.\n\nPor lo tanto, el método es recomendado para la mujer que quiere embarazarse, y no para aquella que pretende evitar el embarazo. Además de eso, su cálculo es solamente una estimación.",
+  "termsAgree": "Estoy consciente",
+  "termsContinue": "Continuar",
+
+  "helpBody": "El \"Calendario de Fertilidad\" es un método usado para tratar de prever los períodos fértiles e infértiles de una mujer. Con él es posible estimar las fechas en las que hay mayor o menor probabilidad de embarazo en caso de relación sexual.\n\nMientras tanto, al contrario de lo que piensa la mayoría de las personas, el calendario de fertilidad no debe ser usado como medio anticonceptivo, pero puede ser usado como una óptima herramienta para quien quiere quedar embarazada. Sin embargo, el método de embarazarse usando el calendario de fertilidad todavía es algo muy confuso para la mayoría de las mujeres.\n\nEl método provee, a través de cálculos estimados, la probable fecha de la ovulación y los períodos más y menos propicios para embarazarse, basado en la fecha de la última ovulación y en la cantidad de días del ciclo menstrual.\n\nNormalmente la ovulación ocurre en el medio del ciclo menstrual. Así, por ejemplo, en un ciclo de 28 días, la ovulación ocurrirá entre el 12º y el 15º día a contar del primer día de la menstruación anterior. Debido a posibles variaciones de la ovulación, así como tiempo de vida de los espermatozoides, el período fértil es considerado de 4 días antes a 4 días después del día probable, totalizando 9 días.\n\nEn algunas situaciones, donde el ciclo menstrual no sigue una regularidad, el calendario de fertilidad no debe ser utilizado.\n\nComo los casos de:\n• Adolescentes, donde es raro que haya un ciclo regular.\n• Mujeres con ciclo menstrual irregular.\n• Mujeres con alteraciones hormonales, emocionales, o aun alimentarias.\n\nSe nota por lo tanto, que el calendario de fertilidad no es un método confiable como anticonceptivo. Además de eso, existen casos de mujeres que pueden quedar embarazadas fuera del período fértil, aun durante la menstruación.\n\nEs importante recordar que este método no previene el SIDA ni otras enfermedades de transmisión sexual."
+}
