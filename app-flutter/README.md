@@ -1,8 +1,11 @@
 # Tabelinha
 
 Calendário do ciclo menstrual e do período fértil. Port em Flutter do app iOS
-original (Objective-C), que continua na pasta [`../tabelinha/`](../tabelinha/) só como
-referência. Este projeto Flutter fica em `app-flutter/`; rode os comandos abaixo de dentro dela.
+original (Objective-C). O código original foi removido da árvore e continua no histórico
+do Git, no commit `8af622c` ("first commit"). Para trazê-lo de volta, na raiz do repositório:
+`git restore --source=8af622c -- tabelinha`.
+
+Este projeto Flutter fica em `app-flutter/`; rode os comandos abaixo de dentro dela.
 
 Bundle id / applicationId: `br.eti.claudiocastro.tabelinha` (o mesmo do app original).
 
@@ -84,7 +87,7 @@ Na primeira abertura, antes da primeira tela, o app traz:
 **O lado Dart é coberto por testes; o Swift ainda não foi compilado nem rodado** (o projeto
 foi desenvolvido no Windows). Para validar num Mac:
 
-1. Rodar o app antigo (`../tabelinha/`) num simulador, definir início/duração e registrar um período com anotação.
+1. Restaurar o app antigo (comando acima) e rodá-lo num simulador, definir início/duração e registrar um período com anotação.
 2. Sem desinstalar, rodar este app no mesmo simulador (mesmo bundle id).
 3. Conferir calendário, histórico e anotação. Para repetir, apague a chave `flutter.legacyImported`
    do `NSUserDefaults` (ou reinstale o app novo mantendo os dados antigos).
