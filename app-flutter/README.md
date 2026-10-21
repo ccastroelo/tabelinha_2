@@ -126,6 +126,66 @@ adb shell pm clear br.eti.claudiocastro.tabelinha
 adb shell bmgr restore 1 br.eti.claudiocastro.tabelinha
 ```
 
+## CI/CD (Codemagic)
+
+O `codemagic.yaml` fica na **raiz do repositório** (`../codemagic.yaml`; o Codemagic só o
+encontra ali) e define três workflows:
+
+| Workflow          | Quando roda                              | O que faz                                                  |
+| ----------------- | ---------------------------------------- | ---------------------------------------------------------- |
+| `tests`           | PR para a `main` e push na `main`        | `flutter analyze` e `flutter test`                         |
+| `android-release` | tag `v*` ou início manual no painel      | AAB assinado, disponível como artefato (sem publicar ainda) |
+| `ios-release`     | tag `v*` ou início manual no painel      | IPA assinado → App Store Connect (não publica na loja)     |
+
+**Para lançar uma versão:** ajuste `version:` no `pubspec.yaml` (ex.: `4.0.1`), commite e
+crie a tag: `git tag v4.0.1 && git push origin v4.0.1`. O número depois do `+` (build) é
+definido pelo CI: o maior entre "último da loja + 1" e o contador do Codemagic.
+
+### Configuração única no painel
+
+1. **Repositório:** em codemagic.io, *Add application* → GitHub → `ccastroelo/tabelinha_2` →
+   Flutter App → configuração por `codemagic.yaml`. Escolha uma branch que já contenha o arquivo.
+2. **iOS:** em *Teams → Integrations → App Store Connect*, crie uma integração chamada
+   **`tabelinha_asc`** com uma chave de API (App Store Connect → Usuários e Acesso →
+   Integrações; permissão App Manager ou superior). O Codemagic cria o certificado e o perfil
+   de distribuição para `br.eti.claudiocastro.tabelinha`. Confira `APP_STORE_APPLE_ID` no
+   `codemagic.yaml`: o valor veio de um comentário do código antigo.
+3. **Android, assinatura:** em *Teams → Code signing identities → Android keystores*, gere um
+   keystore com *reference name* **`tabelinha_keystore`**. Ele será a chave de envio: guarde uma
+   cópia fora do Codemagic e use o Play App Signing, que permite redefinir essa chave.
+4. **Android, primeira versão (o app ainda não existe no Google Play):** crie o app no Play
+   Console (pacote `br.eti.claudiocastro.tabelinha`), rode `android-release`, baixe o `.aab`
+   dos artefatos e envie **manualmente**, por exemplo na faixa de testes internos.
+5. **Android, publicação automática (só depois do passo 4):** crie uma conta de serviço no
+   Google Cloud, dê a ela acesso ao app no Play Console e baixe o JSON. No Codemagic, crie o grupo
+   de variáveis **`google_play`** com a variável secreta `GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS`
+   (conteúdo do JSON). Depois descomente `groups` e `publishing` em `android-release`.
+6. Abra um PR para a `main` e confira se `tests` dispara (o gatilho depende do webhook que o
+   Codemagic cria ao adicionar o repositório).
+
+### O que foi validado
+
+- A estrutura do `codemagic.yaml` (parse, campos obrigatórios, tipos de máquina, prefixo
+  `app-flutter/` nos artefatos) e a lógica do número de build, com stubs da CLI.
+- A assinatura de release do Android, com `jarsigner`: AAB gerado com um keystore descartável
+  passado pelas variáveis `CM_*` saiu assinado por ele, e sem as variáveis (build local) saiu
+  com a chave `Android Debug`, que o Google Play recusa.
+- **Não validado:** a execução no Codemagic em si, a assinatura/envio do iOS e a publicação nas lojas.
+  Isso depende da sua conta e das credenciais; espere ajustes no primeiro build de cada workflow.
+
+### Decisões
+
+- **Máquina:** tudo em `mac_mini_m2`, coberta pelas 500 min/mês do plano gratuito. `linux_x2`
+  é mais barato, mas exige cobrança ativada; se ativar, troque em `tests` e `android-release`.
+  Por isso os releases só rodam por tag, não a cada push.
+- **Publicação conservadora:** o Android só gera o AAB (quando a publicação for ligada, vai como
+  rascunho na faixa interna) e o iOS só chega ao App Store Connect. Liberar para o público é
+  sempre um passo manual seu.
+- **Versão 4.0.0:** o app iOS original estava na 3.0 e a App Store só aceita versão maior que a
+  publicada (confira a versão que está no ar).
+- **Assinatura:** `android/app/build.gradle.kts` lê `CM_KEYSTORE_PATH` e relacionadas. Em build
+  local cai na chave de debug, que o Google Play recusa.
+
 ## Pendências
 
 - Validar a importação no iOS (passos acima).

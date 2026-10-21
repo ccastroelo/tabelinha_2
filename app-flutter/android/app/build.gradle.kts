@@ -25,11 +25,25 @@ android {
         versionName = flutter.versionName
     }
 
+    // Assinatura de release. No Codemagic (android_signing) o keystore chega pelas variáveis CM_*.
+    // Fora dele (build local) cai na chave de debug, para `flutter run --release` continuar
+    // funcionando; o Google Play recusa um AAB assinado com a chave de debug.
+    val keystorePath: String? = System.getenv("CM_KEYSTORE_PATH")
+
+    signingConfigs {
+        if (keystorePath != null) {
+            create("release") {
+                storeFile = file(keystorePath)
+                storePassword = System.getenv("CM_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("CM_KEY_ALIAS")
+                keyPassword = System.getenv("CM_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (keystorePath != null) "release" else "debug")
         }
     }
 }
