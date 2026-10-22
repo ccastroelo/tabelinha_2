@@ -316,10 +316,23 @@ definido pelo CI: o maior entre "último da loja + 1" e o contador do Codemagic.
 2. **iOS — feito, reaproveitando a chave existente.** O `ios-release` usa a chave de API do
    App Store Connect **`codemagic`** (Key ID `6PBVM27M7L`), que já estava na integração
    *Settings → Integrations → Developer Portal* da conta e é a mesma que assina o app atipico.
-   Ela é da equipe dona do bundle `br.eti.claudiocastro.tabelinha` — confirmado porque a lista
-   de bundle identifiers carregada com essa chave inclui o `tabelinha`. Como o certificado de
-   distribuição é por equipe (e a Apple limita quantos existem), ele é reaproveitado; o perfil
-   de provisionamento é por bundle id e o Codemagic cria o do Tabelinha no primeiro build.
+   Ela é da equipe **SYNAPSE SOLUCOES TECNOLOGICAS LTDA** (Team ID `J644ES25W5`), dona do bundle
+   `br.eti.claudiocastro.tabelinha`.
+
+   **Atenção — o bloco `ios_signing` do `codemagic.yaml` só *busca* o que já está em
+   *Settings → Code signing identities*; ele não cria nada.** Os dois primeiros builds falharam
+   justamente por isso, primeiro com "No matching profiles found" e depois com "No matching
+   certificate found for every requested profile". Foi preciso, uma vez:
+
+   - **Perfil:** criar no portal da Apple um perfil *App Store Connect* para
+     `br.eti.claudiocastro.tabelinha` e, no Codemagic, *iOS provisioning profiles → Fetch
+     profiles*, baixá-lo para a conta. (O Xcode cria perfis sozinho, mas só na sua máquina, com
+     Apple ID logado e no *Archive → Distribute App*; a máquina do CI não tem essa sessão.)
+   - **Certificado:** em *iOS certificates → Fetch certificate*, importar o
+     `Apple Distribution: Claudio H P Castro (J644ES25W5)` com o nome `apple_distribution`.
+     É o mesmo certificado do atipico — certificado é por equipe, e a Apple limita quantos
+     existem, então não crie um novo sem necessidade.
+
    O `APP_STORE_APPLE_ID` (595717748) já foi conferido na App Store: é o "Tabelinha", mesmo
    bundle, versão publicada 3.0.
    O build sobe para o App Store Connect e aparece no TestFlight. **Testadores internos** recebem
