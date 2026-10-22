@@ -147,14 +147,19 @@ definido pelo CI: o maior entre "último da loja + 1" e o contador do Codemagic.
 
 ### Configuração única no painel
 
-1. **Repositório:** em codemagic.io, *Add application* → GitHub → `ccastroelo/tabelinha_2` →
-   Flutter App → configuração por `codemagic.yaml`. Escolha uma branch que já contenha o arquivo.
-2. **iOS:** em *Teams → Integrations → App Store Connect*, crie uma integração chamada
-   **`tabelinha_asc`** com uma chave de API (App Store Connect → Usuários e Acesso →
-   Integrações; permissão App Manager ou superior). O Codemagic cria o certificado e o perfil
-   de distribuição para `br.eti.claudiocastro.tabelinha`. O `APP_STORE_APPLE_ID` (595717748) já
-   foi conferido na App Store: é o "Tabelinha", mesmo bundle, versão publicada 3.0. A chave de API
-   precisa ser do time dono do app (SYNAPSE SOLUCOES TECNOLOGICAS LTDA).
+1. **Repositório — feito.** `ccastroelo/tabelinha_2` foi adicionado na conta pessoal do
+   Codemagic como *Flutter App*, com configuração por `codemagic.yaml`. O painel está apontado
+   para a branch `feat/flutter-port`, a única que hoje contém o arquivo; depois do merge na
+   `main`, troque o seletor de branch para `main`.
+2. **iOS — feito, reaproveitando a chave existente.** O `ios-release` usa a chave de API do
+   App Store Connect **`codemagic`** (Key ID `6PBVM27M7L`), que já estava na integração
+   *Settings → Integrations → Developer Portal* da conta e é a mesma que assina o app atipico.
+   Ela é da equipe dona do bundle `br.eti.claudiocastro.tabelinha` — confirmado porque a lista
+   de bundle identifiers carregada com essa chave inclui o `tabelinha`. Como o certificado de
+   distribuição é por equipe (e a Apple limita quantos existem), ele é reaproveitado; o perfil
+   de provisionamento é por bundle id e o Codemagic cria o do Tabelinha no primeiro build.
+   O `APP_STORE_APPLE_ID` (595717748) já foi conferido na App Store: é o "Tabelinha", mesmo
+   bundle, versão publicada 3.0.
    O build sobe para o App Store Connect e aparece no TestFlight. **Testadores internos** recebem
    assim que o processamento termina, sem revisão da Apple. Para **grupo externo**, acrescente
    `submit_to_testflight: true` e `beta_groups:` no bloco `publishing` do `ios-release` — aí

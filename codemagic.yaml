@@ -7,9 +7,10 @@
 # ESCOPO ATUAL: só iOS/TestFlight. O android-release continua no arquivo, mas com o
 # gatilho desligado (ver o bloco comentado nele) — então a tag v* só dispara o iOS.
 #
-# Antes do primeiro build, crie no painel do Codemagic, com exatamente este nome
-# (passo a passo em app-flutter/README.md, "CI/CD"):
-#   - integração App Store Connect ......... tabelinha_asc
+# Assinatura do iOS: usa a chave de API do App Store Connect `codemagic`, que já existe na
+# integração Developer Portal da conta (a mesma do app atipico). Ela é da equipe dona do
+# bundle br.eti.claudiocastro.tabelinha, então o certificado de distribuição é reaproveitado;
+# o perfil de provisionamento é por bundle id e o Codemagic cria o do Tabelinha no 1º build.
 # Para quando o Android voltar à mesa: keystore `tabelinha_keystore` em code signing, e a
 # publicação no Google Play (bloco comentado em android-release) só depois da 1ª versão à mão.
 #
@@ -108,7 +109,7 @@ workflows:
     max_build_duration: 45
     working_directory: app-flutter
     integrations:
-      app_store_connect: tabelinha_asc
+      app_store_connect: codemagic
     environment:
       flutter: 3.44.4
       xcode: latest
