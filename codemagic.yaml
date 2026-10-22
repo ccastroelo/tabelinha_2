@@ -4,16 +4,19 @@
 # app-flutter/: por isso `working_directory` (onde os scripts rodam) e o prefixo
 # `app-flutter/` nos `artifacts` (esses caminhos são relativos à raiz do repositório).
 #
-# Antes do primeiro build, crie no painel do Codemagic os itens abaixo, com
-# exatamente estes nomes (passo a passo em app-flutter/README.md, "CI/CD"):
+# ESCOPO ATUAL: só iOS/TestFlight. O android-release continua no arquivo, mas com o
+# gatilho desligado (ver o bloco comentado nele) — então a tag v* só dispara o iOS.
+#
+# Antes do primeiro build, crie no painel do Codemagic, com exatamente este nome
+# (passo a passo em app-flutter/README.md, "CI/CD"):
 #   - integração App Store Connect ......... tabelinha_asc
-#   - keystore Android (code signing) ...... tabelinha_keystore
-# A publicação automática no Google Play fica desligada: o app ainda não existe no Play
-# Console. Depois da primeira versão enviada à mão, ligue-a (bloco comentado em android-release).
+# Para quando o Android voltar à mesa: keystore `tabelinha_keystore` em code signing, e a
+# publicação no Google Play (bloco comentado em android-release) só depois da 1ª versão à mão.
 #
 # Gatilhos:
 #   - tests ........ pull request para main e push na main
-#   - *-release .... tag v* (ex.: v4.0.0) ou início manual no painel
+#   - ios-release .. tag v* (ex.: v4.0.0) ou início manual no painel
+#   - android-release ... só início manual no painel (gatilho desligado)
 #
 # Todos usam mac_mini_m2, que o plano gratuito cobre (500 min/mês). linux_x2 é mais
 # barato, mas exige cobrança ativada; se ativar, troque nos workflows tests e android-release.
@@ -59,12 +62,16 @@ workflows:
       # secreta GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS e descomente:
       # groups:
       #   - google_play
-    triggering:
-      events:
-        - tag
-      tag_patterns:
-        - pattern: 'v*'
-          include: true
+    # Gatilho desligado: por enquanto o foco é só iOS/TestFlight. Com ele ligado, a tag v*
+    # dispararia este workflow junto com o ios-release e ele falharia, porque o keystore
+    # `tabelinha_keystore` ainda não existe no painel (e gastaria minutos do plano à toa).
+    # O workflow continua disponível para início manual. Para religar, descomente:
+    # triggering:
+    #   events:
+    #     - tag
+    #   tag_patterns:
+    #     - pattern: 'v*'
+    #       include: true
     scripts:
       - name: Dependências
         script: flutter pub get
@@ -110,7 +117,8 @@ workflows:
         bundle_identifier: br.eti.claudiocastro.tabelinha
       vars:
         # ID numérico do app no App Store Connect (Informações do app > ID da Apple).
-        # Veio de um comentário do iRate no código antigo: confirme antes do primeiro build.
+        # Conferido na App Store: id595717748 = "Tabelinha", bundle br.eti.claudiocastro.tabelinha,
+        # versão publicada 3.0. Bate com o bundle identifier abaixo.
         APP_STORE_APPLE_ID: 595717748
     triggering:
       events:

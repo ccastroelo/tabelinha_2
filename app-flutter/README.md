@@ -131,11 +131,15 @@ adb shell bmgr restore 1 br.eti.claudiocastro.tabelinha
 O `codemagic.yaml` fica na **raiz do repositório** (`../codemagic.yaml`; o Codemagic só o
 encontra ali) e define três workflows:
 
+> **Escopo atual: só iOS/TestFlight.** O `android-release` está com o gatilho desligado no
+> `codemagic.yaml` (só roda se iniciado à mão), para a tag `v*` não disparar um build Android
+> que falharia por falta do keystore. Os passos 3 a 5 abaixo ficam para quando o Android voltar.
+
 | Workflow          | Quando roda                              | O que faz                                                  |
 | ----------------- | ---------------------------------------- | ---------------------------------------------------------- |
 | `tests`           | PR para a `main` e push na `main`        | `flutter analyze` e `flutter test`                         |
-| `android-release` | tag `v*` ou início manual no painel      | AAB assinado, disponível como artefato (sem publicar ainda) |
-| `ios-release`     | tag `v*` ou início manual no painel      | IPA assinado → App Store Connect (não publica na loja)     |
+| `android-release` | só início manual no painel (desligado)   | AAB assinado, disponível como artefato (sem publicar ainda) |
+| `ios-release`     | tag `v*` ou início manual no painel      | IPA assinado → App Store Connect/TestFlight (não publica na loja) |
 
 **Para lançar uma versão:** ajuste `version:` no `pubspec.yaml` (ex.: `4.0.1`), commite e
 crie a tag: `git tag v4.0.1 && git push origin v4.0.1`. O número depois do `+` (build) é
@@ -148,8 +152,13 @@ definido pelo CI: o maior entre "último da loja + 1" e o contador do Codemagic.
 2. **iOS:** em *Teams → Integrations → App Store Connect*, crie uma integração chamada
    **`tabelinha_asc`** com uma chave de API (App Store Connect → Usuários e Acesso →
    Integrações; permissão App Manager ou superior). O Codemagic cria o certificado e o perfil
-   de distribuição para `br.eti.claudiocastro.tabelinha`. Confira `APP_STORE_APPLE_ID` no
-   `codemagic.yaml`: o valor veio de um comentário do código antigo.
+   de distribuição para `br.eti.claudiocastro.tabelinha`. O `APP_STORE_APPLE_ID` (595717748) já
+   foi conferido na App Store: é o "Tabelinha", mesmo bundle, versão publicada 3.0. A chave de API
+   precisa ser do time dono do app (SYNAPSE SOLUCOES TECNOLOGICAS LTDA).
+   O build sobe para o App Store Connect e aparece no TestFlight. **Testadores internos** recebem
+   assim que o processamento termina, sem revisão da Apple. Para **grupo externo**, acrescente
+   `submit_to_testflight: true` e `beta_groups:` no bloco `publishing` do `ios-release` — aí
+   passa pela beta review.
 3. **Android, assinatura:** em *Teams → Code signing identities → Android keystores*, gere um
    keystore com *reference name* **`tabelinha_keystore`**. Ele será a chave de envio: guarde uma
    cópia fora do Codemagic e use o Play App Signing, que permite redefinir essa chave.
@@ -170,6 +179,7 @@ definido pelo CI: o maior entre "último da loja + 1" e o contador do Codemagic.
 - A assinatura de release do Android, com `jarsigner`: AAB gerado com um keystore descartável
   passado pelas variáveis `CM_*` saiu assinado por ele, e sem as variáveis (build local) saiu
   com a chave `Android Debug`, que o Google Play recusa.
+- O `APP_STORE_APPLE_ID` e o bundle identifier, contra a ficha pública do app na App Store.
 - **Não validado:** a execução no Codemagic em si, a assinatura/envio do iOS e a publicação nas lojas.
   Isso depende da sua conta e das credenciais; espere ajustes no primeiro build de cada workflow.
 
