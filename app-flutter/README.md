@@ -212,8 +212,12 @@ definido pelo CI: o maior entre "último da loja + 1" e o contador do Codemagic.
 
 ### O que foi validado
 
-- A estrutura do `codemagic.yaml` (parse, campos obrigatórios, tipos de máquina, prefixo
-  `app-flutter/` nos artefatos) e a lógica do número de build, com stubs da CLI.
+- A estrutura do `codemagic.yaml` (parse, campos obrigatórios, tipos de máquina) e a lógica do
+  número de build, com stubs da CLI.
+- **Erro encontrado no primeiro build real:** com o prefixo `app-flutter/` nos `artifacts`, o
+  Codemagic respondeu "No artifacts were found" (o IPA existia). Os padrões agora começam com
+  `**/`; o build imprime `pwd` e `CM_BUILD_DIR` e lista a pasta do IPA/AAB para o log mostrar
+  onde o arquivo está se isso se repetir.
 - A assinatura de release do Android, com `jarsigner`: AAB gerado com um keystore descartável
   passado pelas variáveis `CM_*` saiu assinado por ele, e sem as variáveis (build local) saiu
   com a chave `Android Debug`, que o Google Play recusa.

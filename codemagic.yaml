@@ -1,8 +1,10 @@
 # Codemagic CI/CD do Tabelinha.
 #
 # O arquivo precisa ficar na raiz do repositório. O projeto Flutter está em
-# app-flutter/: por isso `working_directory` (onde os scripts rodam) e o prefixo
-# `app-flutter/` nos `artifacts` (esses caminhos são relativos à raiz do repositório).
+# app-flutter/: por isso `working_directory` (onde os scripts rodam). Os padrões de
+# `artifacts` começam com `**/` porque não ficou claro, nem na documentação, se o Codemagic os
+# resolve a partir da raiz do clone ou do working_directory (com o prefixo app-flutter/ o IPA
+# não foi encontrado).
 #
 # ESCOPO ATUAL: só iOS/TestFlight. O android-release continua no arquivo, mas com o
 # gatilho desligado (ver o bloco comentado nele) — então a tag v* só dispara o iOS.
@@ -90,10 +92,14 @@ workflows:
           fi
           echo "versionCode: $NEXT"
           flutter build appbundle --release --build-number=$NEXT
+          echo "pwd: $(pwd)"
+          echo "CM_BUILD_DIR: $CM_BUILD_DIR"
+          ls -la build/app/outputs/bundle/release
     artifacts:
       # Baixe o .aab aqui para a primeira publicação manual no Play Console.
-      - app-flutter/build/**/outputs/**/*.aab
-      - app-flutter/build/**/outputs/**/mapping.txt
+      # O `**/` na frente: ver a nota em ios-release.
+      - '**/build/app/outputs/bundle/release/*.aab'
+      - '**/build/app/outputs/mapping/release/mapping.txt'
     # Publicação automática: descomente junto com o grupo google_play, só depois que a
     # primeira versão (enviada à mão) existir no Play Console.
     # publishing:
@@ -147,8 +153,16 @@ workflows:
           flutter build ipa --release \
             --build-number=$NEXT \
             --export-options-plist=/Users/builder/export_options.plist
+          # Diagnóstico de artefatos: mostra onde o IPA ficou, para o log explicar sozinho
+          # caso a etapa "Gathering artifacts" não o encontre.
+          echo "pwd: $(pwd)"
+          echo "CM_BUILD_DIR: $CM_BUILD_DIR"
+          ls -la build/ios/ipa
     artifacts:
-      - app-flutter/build/ios/ipa/*.ipa
+      # O `**/` na frente vale tanto se o Codemagic resolver o caminho a partir da raiz do clone
+      # quanto a partir do working_directory. A 1ª versão, com o prefixo app-flutter/, não
+      # achou o IPA ("No artifacts were found").
+      - '**/build/ios/ipa/*.ipa'
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
