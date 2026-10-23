@@ -53,8 +53,22 @@ lib/
   `fertileHalfWindow` (`lib/core/cycle_calculator.dart`) e o `helpBody` dos ARBs juntos.
 - **Projeção do ciclo.** O original só projetava um ciclo antes da data de início; aqui o
   ciclo é projetado para qualquer data.
+- **Previsão pelo histórico.** Com 3 ou mais menstruações vividas (o início de referência e os
+  registros que já começaram), o app usa a média dos últimos ciclos (até 6) no lugar da duração
+  fixa, e os ciclos já vividos aparecem com as datas reais de cada um. Intervalos fora de 8 a 55
+  dias são descartados: um buraco sem registro não é um ciclo de 90 dias. A janela fértil
+  continua de 9 dias, com a ovulação na metade de cada ciclo. O interruptor "Calcular pelo
+  histórico", em "Seu ciclo", desliga isso e volta ao cálculo de sempre; o teste
+  `history_prediction_test.dart` garante que, com ciclos regulares, os dois dão o mesmo
+  calendário. Código: `knownPeriods`, `estimateCycleLength` e `CycleCalculator.known` em
+  `lib/core/cycle_calculator.dart`.
+  - **Limite:** o histórico só reflete a realidade se a data de início for corrigida quando a
+    menstruação vem em outro dia e o mês for registrado de novo. "Registrar menstruação do mês"
+    grava as datas que o próprio app projetou; sem correção, a média sai igual à duração fixa.
 - **Histórico.** Registrar o mesmo período duas vezes atualiza o registro em vez de duplicar
-  (o original duplicava). A identidade do registro é a data de início.
+  (o original duplicava). A identidade do registro é a data de início. Registrar uma data a menos
+  de 8 dias de um registro corrige esse registro (e mantém a anotação) em vez de criar outro,
+  que estragaria a média.
 - **Termos.** O original encerrava o app (`exit(0)`) se a pessoa não concordasse. A App Store
   não aceita isso; aqui o botão "Continuar" só habilita depois de marcar "Estou ciente".
 - **Anotações.** Salvam sozinhas ao sair da tela (sem Cancelar/Gravar).

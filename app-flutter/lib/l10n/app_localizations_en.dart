@@ -93,6 +93,22 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get autoCycleTitle => 'Calculate from history';
+
+  @override
+  String autoCycleUsing(int days, int cycles) {
+    return 'Using $days days, the average of your last $cycles cycles.';
+  }
+
+  @override
+  String autoCycleNeedsData(int count) {
+    return 'With $count periods in your history, the app switches to the average of your cycles. For now it uses the length above.';
+  }
+
+  @override
+  String get autoCycleOff => 'Using the length you set above.';
+
+  @override
   String get setupTitle => 'Let’s get started';
 
   @override
@@ -164,5 +180,5 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpBody =>
-      'The \"Menstrual Period Calendar\" is a method used to forecast the fertile and infertile periods of a woman. Through this calendar it is possible to estimate the most likely dates of getting pregnant in case of sexual relations.\n\nHowever, contrary to what most people think, the \"menstrual period calendar\" shall not be used as a contraceptive method, but it is a great tool for those looking to get pregnant. Nevertheless, the method for getting pregnant by using the \"menstrual period calendar\" is still very confusing for most women.\n\nThe method indicates, using estimated calculations, the most likely date of ovulation and the periods that are more and less favorable for getting pregnant, based on the date of the last ovulation and the number of days of the menstrual cycle.\n\nUsually the ovulation happens in the middle of the menstrual cycle. Thus, for example, in a 28-day cycle, the ovulation will happen between the 12th and the 15th day counting from the first day of the last menstrual period. Due to possible variations in ovulation, as well as the sperm lifetime, the fertile period is considered between 4 days before and 4 days after the most likely day, totalling 9 days.\n\nIn some situations, where the cycle is not regular, the \"menstrual period calendar\" must not be used.\nSuch as the cases of:\n• Teenagers, in which a regular cycle is rare.\n• Women with an irregular cycle.\n• Women with hormonal, emotional or even dietary changes.\n\nThen, it is clear that the \"menstrual period calendar\" is not a reliable contraceptive method. Besides that, there are cases in which women get pregnant outside their fertile period, even during menstruation.\n\nIt is important to keep in mind that this method does not prevent AIDS or any other STD.';
+      'The \"Menstrual Period Calendar\" is a method used to forecast the fertile and infertile periods of a woman. Through this calendar it is possible to estimate the most likely dates of getting pregnant in case of sexual relations.\n\nHowever, contrary to what most people think, the \"menstrual period calendar\" shall not be used as a contraceptive method, but it is a great tool for those looking to get pregnant. Nevertheless, the method for getting pregnant by using the \"menstrual period calendar\" is still very confusing for most women.\n\nThe method indicates, using estimated calculations, the most likely date of ovulation and the periods that are more and less favorable for getting pregnant, based on the date of the last ovulation and the number of days of the menstrual cycle.\n\nUsually the ovulation happens in the middle of the menstrual cycle. Thus, for example, in a 28-day cycle, the ovulation will happen between the 12th and the 15th day counting from the first day of the last menstrual period. Due to possible variations in ovulation, as well as the sperm lifetime, the fertile period is considered between 4 days before and 4 days after the most likely day, totalling 9 days.\n\nWhen there are at least 3 periods in your history, the app uses the average of your last cycles (up to 6) instead of the length you set, and the cycles you have already lived show their real dates. This way the forecast follows your own rhythm. You can turn this off in “Your cycle”.\n\nIn some situations, where the cycle is not regular, the \"menstrual period calendar\" must not be used.\nSuch as the cases of:\n• Teenagers, in which a regular cycle is rare.\n• Women with an irregular cycle.\n• Women with hormonal, emotional or even dietary changes.\n\nThen, it is clear that the \"menstrual period calendar\" is not a reliable contraceptive method. Besides that, there are cases in which women get pregnant outside their fertile period, even during menstruation.\n\nIt is important to keep in mind that this method does not prevent AIDS or any other STD.';
 }

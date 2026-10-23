@@ -25,6 +25,17 @@ flutter test --no-pub
 Só commite ou faça push quando a pessoa pedir, e respeite o que ela pediu ("só commit
 local" ou "faça o push"). Nunca force-push.
 
+## Cálculo do ciclo
+
+`lib/core/cycle_calculator.dart` é Dart puro, sem Flutter. Duas regras que não se quebram:
+
+- **Janela fértil de 9 dias** (`fertileHalfWindow = 4`): o texto de ajuda dos ARBs cita os mesmos
+  números, e `test/help_text_test.dart` confere. Mudou um, mude o outro.
+- **Sem histórico, o cálculo é idêntico ao do app original** (`test/cycle_calculator_test.dart`
+  compara todas as combinações). A previsão pelo histórico (`knownPeriods`,
+  `estimateCycleLength`, `CycleCalculator.known`) só entra por cima disso, e
+  `test/history_prediction_test.dart` prova que, com ciclos regulares, dá o mesmo calendário.
+
 ## Visual: direção "Acolhedor"
 
 Cantos bem arredondados, sombra suave, fonte redonda e a identidade coral do ícone.

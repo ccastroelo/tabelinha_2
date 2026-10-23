@@ -226,6 +226,30 @@ abstract class AppLocalizations {
   /// **'Aumentar: {label}'**
   String increaseValue(String label);
 
+  /// No description provided for @autoCycleTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Calcular pelo histórico'**
+  String get autoCycleTitle;
+
+  /// No description provided for @autoCycleUsing.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usando {days} dias, a média dos seus últimos {cycles} ciclos.'**
+  String autoCycleUsing(int days, int cycles);
+
+  /// No description provided for @autoCycleNeedsData.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com {count} menstruações no histórico, o app passa a usar a média dos seus ciclos. Por enquanto vale a duração acima.'**
+  String autoCycleNeedsData(int count);
+
+  /// No description provided for @autoCycleOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Usando a duração que você definiu acima.'**
+  String get autoCycleOff;
+
   /// No description provided for @setupTitle.
   ///
   /// In pt, this message translates to:
@@ -355,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @helpBody.
   ///
   /// In pt, this message translates to:
-  /// **'A \"tabelinha\" é um método usado para tentar prever os períodos férteis e inférteis de uma mulher. Através dela é possível estimar as datas onde há maior ou menor probabilidade de gravidez em caso de relação sexual.\n\nNo entanto, ao contrário que a maioria das pessoas pensa, a tabelinha não deve ser usada como meio contraceptivo, mas pode ser usada como ótima ferramenta para quem busca engravidar. Porém, o método de engravidar usando a tabelinha ainda é algo muito confuso para a maioria das mulheres.\n\nO método fornece, através de cálculos estimados, a provável data da ovulação e os períodos mais e menos propícios para engravidar, com base na data da última ovulação e na quantidade de dias do ciclo menstrual.\n\nNormalmente a ovulação ocorre no meio do ciclo menstrual. Assim, por exemplo, em um ciclo de 28 dias, a ovulação ocorrerá entre o 12º e o 15º dias a contar do primeiro dia da menstruação anterior. Devido a possíveis variações da ovulação, bem como tempo de vida dos espermatozoides, o período fértil é considerado de 4 dias antes a 4 dias depois do dia provável, totalizando 9 dias.\n\nEm algumas situações, onde o ciclo menstrual não segue uma regularidade, a tabelinha não deve ser utilizada.\nComo os casos de:\n• Adolescentes, onde é raro haver um ciclo regular.\n• Mulheres com ciclo menstrual desregulado.\n• Mulheres com alterações hormonais, emocionais, ou mesmo alimentares.\n\nPercebe-se então, que a tabelinha não é um método confiável como contraceptivo. Além disso, existem casos de mulheres que podem engravidar fora do período fértil, mesmo durante a menstruação.\n\nÉ importante lembrar que este método não previne a AIDS nem outras DSTs.'**
+  /// **'A \"tabelinha\" é um método usado para tentar prever os períodos férteis e inférteis de uma mulher. Através dela é possível estimar as datas onde há maior ou menor probabilidade de gravidez em caso de relação sexual.\n\nNo entanto, ao contrário que a maioria das pessoas pensa, a tabelinha não deve ser usada como meio contraceptivo, mas pode ser usada como ótima ferramenta para quem busca engravidar. Porém, o método de engravidar usando a tabelinha ainda é algo muito confuso para a maioria das mulheres.\n\nO método fornece, através de cálculos estimados, a provável data da ovulação e os períodos mais e menos propícios para engravidar, com base na data da última ovulação e na quantidade de dias do ciclo menstrual.\n\nNormalmente a ovulação ocorre no meio do ciclo menstrual. Assim, por exemplo, em um ciclo de 28 dias, a ovulação ocorrerá entre o 12º e o 15º dias a contar do primeiro dia da menstruação anterior. Devido a possíveis variações da ovulação, bem como tempo de vida dos espermatozoides, o período fértil é considerado de 4 dias antes a 4 dias depois do dia provável, totalizando 9 dias.\n\nQuando há pelo menos 3 menstruações no histórico, o app usa a média dos seus últimos ciclos (até 6) no lugar da duração que você definiu, e os ciclos que você já viveu aparecem com as datas reais. Assim a previsão acompanha o seu ritmo. Você pode desligar isso em “Seu ciclo”.\n\nEm algumas situações, onde o ciclo menstrual não segue uma regularidade, a tabelinha não deve ser utilizada.\nComo os casos de:\n• Adolescentes, onde é raro haver um ciclo regular.\n• Mulheres com ciclo menstrual desregulado.\n• Mulheres com alterações hormonais, emocionais, ou mesmo alimentares.\n\nPercebe-se então, que a tabelinha não é um método confiável como contraceptivo. Além disso, existem casos de mulheres que podem engravidar fora do período fértil, mesmo durante a menstruação.\n\nÉ importante lembrar que este método não previne a AIDS nem outras DSTs.'**
   String get helpBody;
 }
 

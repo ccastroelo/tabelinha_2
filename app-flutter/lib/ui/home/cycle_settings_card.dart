@@ -49,10 +49,17 @@ class CycleSettingsCard extends StatelessWidget {
           divider,
           _StepperRow(
             label: l10n.cycleLength,
-            value: settings.cycleLength,
+            value: controller.effectiveCycleLength,
             min: CycleSettings.minCycleLength,
             max: CycleSettings.maxCycleLength,
+            // Com a média em uso, o valor não é da pessoa: para mudar, desliga o cálculo.
+            enabled: controller.estimate == null,
             onChanged: controller.setCycleLength,
+          ),
+          _AutoCycleRow(
+            enabled: settings.autoCycleLength,
+            estimate: controller.estimate,
+            onChanged: controller.setAutoCycleLength,
           ),
           divider,
           _StepperRow(
@@ -126,6 +133,47 @@ class _StartDateRow extends StatelessWidget {
   }
 }
 
+/// Liga e desliga o cálculo pelo histórico e diz, numa frase, o que está valendo.
+class _AutoCycleRow extends StatelessWidget {
+  const _AutoCycleRow({
+    required this.enabled,
+    required this.estimate,
+    required this.onChanged,
+  });
+
+  final bool enabled;
+  final CycleEstimate? estimate;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+
+    final estimate = this.estimate;
+    final status = !enabled
+        ? l10n.autoCycleOff
+        : estimate != null
+            ? l10n.autoCycleUsing(estimate.cycleLength, estimate.cycles)
+            : l10n.autoCycleNeedsData(estimateMinCycles + 1);
+
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      value: enabled,
+      onChanged: onChanged,
+      title: Text(
+        l10n.autoCycleTitle,
+        style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+      ),
+      subtitle: Text(
+        status,
+        style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+      ),
+    );
+  }
+}
+
 class _StepperRow extends StatelessWidget {
   const _StepperRow({
     required this.label,
@@ -133,6 +181,7 @@ class _StepperRow extends StatelessWidget {
     required this.min,
     required this.max,
     required this.onChanged,
+    this.enabled = true,
   });
 
   final String label;
@@ -140,6 +189,7 @@ class _StepperRow extends StatelessWidget {
   final int min;
   final int max;
   final ValueChanged<int> onChanged;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +202,7 @@ class _StepperRow extends StatelessWidget {
       children: [
         IconButton.filledTonal(
           tooltip: l10n.decreaseValue(label),
-          onPressed: value > min ? () => onChanged(value - 1) : null,
+          onPressed: enabled && value > min ? () => onChanged(value - 1) : null,
           icon: const Icon(Icons.remove),
         ),
         // Flexible + FittedBox: se faltar largura o valor encolhe em vez de estourar a linha.
@@ -177,7 +227,7 @@ class _StepperRow extends StatelessWidget {
         ),
         IconButton.filledTonal(
           tooltip: l10n.increaseValue(label),
-          onPressed: value < max ? () => onChanged(value + 1) : null,
+          onPressed: enabled && value < max ? () => onChanged(value + 1) : null,
           icon: const Icon(Icons.add),
         ),
       ],

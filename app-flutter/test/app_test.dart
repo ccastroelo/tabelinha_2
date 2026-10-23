@@ -196,6 +196,125 @@ void main() {
     });
   });
 
+  group('previsão pelo histórico', () {
+    /// Três menstruações a 27 dias uma da outra; a de 5/10 é também o início de referência.
+    Future<AppController> withHistory() async {
+      final controller = await _controller(_configured());
+      await controller.registerPeriods([
+        PeriodRange(DateTime.utc(2026, 8, 12), DateTime.utc(2026, 8, 16)),
+        PeriodRange(DateTime.utc(2026, 9, 8), DateTime.utc(2026, 9, 12)),
+        PeriodRange(DateTime.utc(2026, 10, 5), DateTime.utc(2026, 10, 9)),
+      ]);
+      return controller;
+    }
+
+    IconButton cycleLengthPlus(WidgetTester tester) =>
+        tester.widget(find.widgetWithIcon(IconButton, Icons.add).first);
+
+    test('sem histórico suficiente vale a duração definida', () async {
+      final controller = await _controller(_configured());
+      expect(controller.estimate, isNull);
+      expect(controller.effectiveCycleLength, 28);
+      expect(controller.calculator.nextPeriodStart(controller.today), DateTime.utc(2026, 11, 2));
+    });
+
+    test('com três menstruações usa a média e a próxima vem dela', () async {
+      final controller = await withHistory();
+      expect(controller.estimate!.cycleLength, 27);
+      expect(controller.estimate!.cycles, 2);
+      expect(controller.effectiveCycleLength, 27);
+      // 5/10 + 27 = 1/11, e não 2/11 como daria a duração de 28 dias.
+      expect(controller.calculator.nextPeriodStart(controller.today), DateTime.utc(2026, 11, 1));
+    });
+
+    test('desligado, volta ao cálculo de sempre, com o valor que a média dava', () async {
+      final controller = await withHistory();
+      await controller.setAutoCycleLength(false);
+
+      expect(controller.settings.autoCycleLength, isFalse);
+      expect(controller.settings.cycleLength, 27);
+      expect(controller.estimate, isNull);
+      expect(controller.calculator.nextPeriodStart(controller.today), DateTime.utc(2026, 11, 1));
+
+      await controller.setCycleLength(30);
+      expect(controller.calculator.nextPeriodStart(controller.today), DateTime.utc(2026, 11, 4));
+    });
+
+    test('corrigir a data de início não cria um ciclo de um dia', () async {
+      final controller = await withHistory();
+      await controller.setCycleStart(DateTime.utc(2026, 10, 6));
+      // 12/8 → 8/9 (27) → 6/10 (28): a 5/10 do registro e a 6/10 são o mesmo episódio.
+      expect(controller.estimate!.cycles, 2);
+      expect(controller.estimate!.cycleLength, 28);
+    });
+
+    test('registrar uma data corrigida substitui o registro e mantém a anotação', () async {
+      final controller = await _controller(_configured());
+      await controller.registerPeriods([
+        PeriodRange(DateTime.utc(2026, 11, 2), DateTime.utc(2026, 11, 6)),
+      ]);
+      await controller.updateNote(controller.records.single, 'nota');
+
+      final added = await controller.registerPeriods([
+        PeriodRange(DateTime.utc(2026, 11, 4), DateTime.utc(2026, 11, 8)),
+      ]);
+      expect(added, 1);
+      expect(controller.records, hasLength(1));
+      expect(controller.records.single.start, DateTime.utc(2026, 11, 4));
+      expect(controller.records.single.end, DateTime.utc(2026, 11, 8));
+      expect(controller.records.single.note, 'nota');
+
+      // Uma menstruação um ciclo depois é outra, não uma correção.
+      await controller.registerPeriods([
+        PeriodRange(DateTime.utc(2026, 12, 2), DateTime.utc(2026, 12, 6)),
+      ]);
+      expect(controller.records, hasLength(2));
+    });
+
+    testWidgets('sem histórico a tela explica quando a média passa a valer', (tester) async {
+      await _pump(tester, await _controller(_configured()));
+      await tester.scrollUntilVisible(find.textContaining('With 3 periods'), 200);
+      expect(find.byType(Switch), findsOneWidget);
+      expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+      // Sem média, os botões do ciclo seguem livres.
+      expect(cycleLengthPlus(tester).onPressed, isNotNull);
+    });
+
+    testWidgets('com histórico a tela mostra a média e trava o valor manual', (tester) async {
+      await _pump(tester, await withHistory());
+      expect(find.textContaining('in 11 days'), findsOneWidget); // próxima menstruação: 1/11
+
+      await tester.scrollUntilVisible(
+        find.text('Using 27 days, the average of your last 2 cycles.'),
+        200,
+      );
+      expect(find.text('27 days'), findsOneWidget);
+      expect(cycleLengthPlus(tester).onPressed, isNull);
+    });
+
+    testWidgets('o interruptor desliga e liga o cálculo pelo histórico', (tester) async {
+      final controller = await withHistory();
+      await _pump(tester, controller);
+
+      await _tapVisible(tester, find.byType(Switch));
+      expect(controller.settings.autoCycleLength, isFalse);
+      expect(find.text('Using the length you set above.'), findsOneWidget);
+      expect(cycleLengthPlus(tester).onPressed, isNotNull);
+
+      await _tapVisible(tester, find.byTooltip('Increase: Cycle length'));
+      expect(controller.settings.cycleLength, 28);
+      expect(find.text('28 days'), findsOneWidget);
+
+      await _tapVisible(tester, find.byType(Switch));
+      expect(controller.settings.autoCycleLength, isTrue);
+      expect(controller.estimate!.cycleLength, 27);
+      expect(
+        find.text('Using 27 days, the average of your last 2 cycles.'),
+        findsOneWidget,
+      );
+    });
+  });
+
   // Pior caso comum: celular pequeno (360×640 dp) com a fonte do sistema a 2,0×.
   // Um RenderFlex overflow vira exceção no teste, então basta percorrer as telas.
   group('layout com fonte ampliada em tela estreita', () {
@@ -281,6 +400,15 @@ void main() {
       expect(second.settings.start, DateTime.utc(2026, 10, 5));
       expect(second.termsAccepted, isTrue);
       expect(second.records.single.note, 'nota');
+    });
+
+    test('desligar o cálculo pelo histórico sobrevive a reiniciar o app', () async {
+      final first = await _controller(_configured());
+      expect(first.settings.autoCycleLength, isTrue);
+      await first.setAutoCycleLength(false);
+
+      final second = AppController(await CycleRepository.open(), now: () => _now);
+      expect(second.settings.autoCycleLength, isFalse);
     });
 
     test('histórico corrompido não derruba o app', () async {

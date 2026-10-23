@@ -20,4 +20,15 @@ void main() {
       expect(value, contains('$total'), reason: '$key: janela total de $total dias');
     }
   });
+
+  test('o texto de ajuda cita os números da previsão pelo histórico', () {
+    const minPeriods = estimateMinCycles + 1;
+
+    expect(AppLocalizationsPt().helpBody, contains('$minPeriods menstruações no histórico'));
+    expect(AppLocalizationsPt().helpBody, contains('(até $estimateMaxCycles)'));
+    expect(AppLocalizationsEn().helpBody, contains('$minPeriods periods in your history'));
+    expect(AppLocalizationsEn().helpBody, contains('(up to $estimateMaxCycles)'));
+    expect(AppLocalizationsEs().helpBody, contains('$minPeriods menstruaciones en el historial'));
+    expect(AppLocalizationsEs().helpBody, contains('(hasta $estimateMaxCycles)'));
+  });
 }

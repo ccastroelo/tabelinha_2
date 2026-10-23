@@ -22,8 +22,33 @@ class AppController extends ChangeNotifier {
   bool _termsAccepted;
 
   CycleSettings get settings => _settings;
-  CycleCalculator get calculator => CycleCalculator(_settings);
   bool get termsAccepted => _termsAccepted;
+
+  /// Menstruações já vividas: o início de referência e os registros que já começaram.
+  List<PeriodRange> get _knownPeriods => knownPeriods(
+        reference: _settings.start,
+        periodLength: _settings.periodLength,
+        records: _records.map((r) => PeriodRange(r.start, r.end)),
+        today: today,
+      );
+
+  /// Média dos últimos ciclos, ou `null` enquanto o histórico não basta (ou se a pessoa
+  /// desligou o cálculo pelo histórico).
+  CycleEstimate? get estimate => _settings.autoCycleLength
+      ? estimateCycleLength(_knownPeriods.map((p) => p.start), today: today)
+      : null;
+
+  /// Duração do ciclo que o app usa de fato nas projeções: a média, se houver, ou a
+  /// que a pessoa definiu.
+  int get effectiveCycleLength => estimate?.cycleLength ?? _settings.cycleLength;
+
+  CycleCalculator get calculator {
+    if (!_settings.autoCycleLength) return CycleCalculator(_settings);
+    return CycleCalculator(
+      _settings.copyWith(cycleLength: effectiveCycleLength),
+      known: _knownPeriods,
+    );
+  }
 
   /// Dia de hoje sem hora, calculado a cada leitura para acompanhar a virada do dia.
   DateTime get today => dateOnly(_now());
@@ -86,6 +111,15 @@ class AppController extends ChangeNotifier {
   Future<void> setPeriodLength(int days) =>
       _updateSettings(_settings.copyWith(periodLength: days));
 
+  /// Liga ou desliga o cálculo pelo histórico. Ao desligar, o valor manual passa a ser o
+  /// que a média estava dando, para o calendário não dar um salto sob os olhos da pessoa.
+  Future<void> setAutoCycleLength(bool enabled) {
+    final next = enabled
+        ? _settings.copyWith(autoCycleLength: true)
+        : _settings.copyWith(autoCycleLength: false, cycleLength: effectiveCycleLength);
+    return _updateSettings(next);
+  }
+
   Future<void> _updateSettings(CycleSettings next) async {
     _settings = next;
     notifyListeners();
@@ -93,18 +127,34 @@ class AppController extends ChangeNotifier {
   }
 
   /// Guarda as menstruações no histórico. Quem já existe (mesmo início) tem o
-  /// fim atualizado e mantém a anotação. Devolve quantas são novas.
+  /// fim atualizado e mantém a anotação. Uma data a menos de
+  /// [CycleSettings.minCycleLength] dias de um registro é a mesma menstruação com a data
+  /// corrigida: substitui o registro (e mantém a anotação) em vez de criar outro, que
+  /// estragaria a média dos ciclos. Devolve quantas são novas ou corrigidas.
   Future<int> registerPeriods(Iterable<PeriodRange> ranges) async {
     var added = 0;
     final next = [..._records];
     for (final range in ranges) {
-      final index = next.indexWhere((r) => r.start.isSameDay(range.start));
-      if (index == -1) {
-        next.add(PeriodRecord(start: range.start, end: range.end));
-        added++;
-      } else {
-        next[index] = next[index].copyWith(end: range.end);
+      final same = next.indexWhere((r) => r.start.isSameDay(range.start));
+      if (same != -1) {
+        next[same] = next[same].copyWith(end: range.end);
+        continue;
       }
+
+      final near = next.indexWhere(
+        (r) => r.start.daysSince(range.start).abs() < CycleSettings.minCycleLength,
+      );
+      final record = PeriodRecord(
+        start: range.start,
+        end: range.end,
+        note: near == -1 ? '' : next[near].note,
+      );
+      if (near == -1) {
+        next.add(record);
+      } else {
+        next[near] = record;
+      }
+      added++;
     }
     await _saveRecords(next);
     return added;

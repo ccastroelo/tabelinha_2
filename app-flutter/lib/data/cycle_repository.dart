@@ -17,6 +17,7 @@ class CycleRepository {
   static const _kStart = 'cycleStart';
   static const _kCycleLength = 'cycleLength';
   static const _kPeriodLength = 'periodLength';
+  static const _kAutoCycleLength = 'autoCycleLength';
   static const _kTermsAcceptedAt = 'termsAcceptedAt';
   static const _kRecords = 'periodRecords';
   static const _kLegacyImported = 'legacyImported';
@@ -29,6 +30,7 @@ class CycleRepository {
       start: tryParseIsoDate(_prefs.getString(_kStart)),
       cycleLength: _prefs.getInt(_kCycleLength),
       periodLength: _prefs.getInt(_kPeriodLength),
+      autoCycleLength: _prefs.getBool(_kAutoCycleLength),
     );
   }
 
@@ -37,6 +39,7 @@ class CycleRepository {
     if (start != null) await _prefs.setString(_kStart, toIsoDate(start));
     await _prefs.setInt(_kCycleLength, settings.cycleLength);
     await _prefs.setInt(_kPeriodLength, settings.periodLength);
+    await _prefs.setBool(_kAutoCycleLength, settings.autoCycleLength);
   }
 
   DateTime? loadTermsAcceptedAt() =>
