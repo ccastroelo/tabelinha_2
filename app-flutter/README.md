@@ -216,6 +216,19 @@ As telas, na ordem: `01-today`, `02-calendar`, `03-settings`, `04-records`, `05-
   sai com canal alfa.
 - Os textos de marketing não prometem eficácia contraceptiva, que o app também não oferece.
 
+## Política de privacidade
+
+`store/privacy-policy.html` é a política, em português, inglês e espanhol, num arquivo só e sem
+nenhum recurso externo. Ela descreve o que o app faz de fato: nada sai do aparelho (sem rede,
+conta, anúncios nem analytics). Se o app passar a enviar qualquer dado, a política precisa mudar
+junto, e o questionário de privacidade da loja também.
+
+- **Antes de publicar**, troque os três `[e-mail de contato]` (um por idioma); estão em amarelo.
+- **Endereço por idioma**: o mesmo arquivo, com `#pt`, `#en` ou `#es` no fim, mostra só aquele
+  idioma. Dá para usar um endereço diferente em cada localização do App Store Connect.
+- **Hospedagem**: qualquer página estática serve (por exemplo, GitHub Pages). A loja exige uma URL
+  pública da política.
+
 ## CI/CD (Codemagic)
 
 O `codemagic.yaml` fica na **raiz do repositório** (`../codemagic.yaml`; o Codemagic só o
