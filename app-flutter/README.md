@@ -194,6 +194,9 @@ Validado no emulador Android (ícone adaptativo e splash). O lado iOS (catálogo
 Para um tamanho de iPhone novo, acrescente um `_Device` em `_devices` no gerador. As prévias
 em vídeo (1920×886 ou 886×1920) não são geradas aqui: são vídeos, não telas.
 
+Os textos da loja (nome, subtítulo, descrição, palavras-chave e novidades, nos mesmos três
+idiomas) estão em `store/ios/descricoes.md`, com o limite de caracteres de cada campo.
+
 | Pasta   | Localização na loja                                           |
 | ------- | ------------------------------------------------------------- |
 | `pt-BR` | Português (Brasil)                                            |
