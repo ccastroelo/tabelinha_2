@@ -288,6 +288,14 @@ junto, e o questionário de privacidade da loja também.
 - **Hospedagem**: qualquer página estática serve (por exemplo, GitHub Pages). A loja exige uma URL
   pública da política.
 
+## Concorrentes e posicionamento
+
+`store/concorrentes.md` situa o Tabelinha entre os apps do nicho (os grandes de assinatura, os
+clones com anúncio, os de privacidade e o Controle do Ciclo embutido no Apple Saúde), lista as
+lacunas em ordem de custo-benefício e registra o que não copiar. Levantamento de 23/10/2026,
+feito por pesquisa na web: número de usuários, preço e política de privacidade envelhecem
+rápido, então confira na fonte antes de decidir por um número de lá.
+
 ## CI/CD (Codemagic)
 
 O `codemagic.yaml` fica na **raiz do repositório** (`../codemagic.yaml`; o Codemagic só o
