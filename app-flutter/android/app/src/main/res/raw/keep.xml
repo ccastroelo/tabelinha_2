@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- O encolhimento de recursos do build de release apaga o que nenhum código referencia por
+     id. O ícone das notificações é procurado pelo NOME, em texto, pelo plugin de
+     notificações (ver LocalNotificationsService), então precisa ser preservado à mão: sem
+     isto os lembretes falham no release com "invalid_icon" (no debug, que não encolhe, não). -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_tabelinha" />

@@ -184,6 +184,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderOvulationBody => 'Today is your likely ovulation day.';
 
   @override
+  String get appLockTitle => 'App lock';
+
+  @override
+  String get appLockHintOff =>
+      'Ask for your fingerprint, face or device code to open the app.';
+
+  @override
+  String get appLockHintOn =>
+      'The app asks for your fingerprint, face or device code when it opens and after being away for more than half a minute.';
+
+  @override
+  String get appLockUnavailable =>
+      'To use the lock, first set a screen lock (PIN, pattern, fingerprint or face) in the device settings.';
+
+  @override
+  String get appLockDisabledBySystem =>
+      'The lock was turned off because the device no longer has a screen lock.';
+
+  @override
+  String get appLockReasonOpen => 'Confirm it’s you to open the app.';
+
+  @override
+  String get appLockReasonEnable => 'Confirm it’s you to turn the lock on.';
+
+  @override
+  String get appLockReasonDisable => 'Confirm it’s you to turn the lock off.';
+
+  @override
+  String get lockScreenBody =>
+      'The app is locked. Confirm it’s you to see your calendar.';
+
+  @override
+  String get lockScreenButton => 'Unlock';
+
+  @override
+  String get lockScreenFailed => 'Couldn’t confirm. Try again.';
+
+  @override
   String get setupTitle => 'Let’s get started';
 
   @override

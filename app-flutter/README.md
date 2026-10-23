@@ -80,10 +80,35 @@ lib/
     para outro fuso os avisos já agendados seguem o horário de antes até o app abrir de novo.
     Sem alarme exato, o aviso pode atrasar alguns minutos.
   - **Android:** exige `coreLibraryDesugaring` no `build.gradle.kts` e os receptores do plugin
-    no `AndroidManifest.xml`; o ícone da barra de status é `res/drawable/ic_stat_tabelinha.xml`.
+    no `AndroidManifest.xml`; o ícone da barra de status é `res/drawable/ic_stat_tabelinha.xml`,
+    e o `res/raw/keep.xml` o protege do encolhimento de recursos do release (o plugin o procura
+    pelo nome; sem isso os lembretes falham no release com `invalid_icon`, e só lá).
     **iOS:** o `AppDelegate.swift` define o delegado das notificações. Não foi testado em
     aparelho (sem Mac): vale conferir no TestFlight que o pedido de permissão aparece e que
     os avisos chegam.
+- **Bloqueio do app.** Opcional e desligado por padrão ("Bloqueio do app", na home). Usa a
+  autenticação do próprio aparelho (digital, rosto ou código de tela, pelo `local_auth`): o app
+  não guarda senha nem recebe biometria, só ouve "sim" ou "não" do sistema, e não existe
+  "esqueci o PIN" que apague dados.
+  - **Quando tranca:** ao abrir o app e depois de ficar mais de 30 s fora (`lockGracePeriod`); a
+    carência evita pedir de novo ao voltar da folha de compartilhar ou de um diálogo de
+    permissão. Enquanto a tela do sistema está aberta, o app não conta isso como "ter saído".
+    Relógio que volta para trás tranca.
+  - **Capa de privacidade:** com o bloqueio ligado, o app se cobre assim que sai da frente, para
+    a prévia nos apps recentes não mostrar os dados (conferido no emulador).
+  - **Ligar e desligar** exigem se identificar, para quem pegar o celular desbloqueado não
+    desligar. Sem bloqueio de tela no aparelho o interruptor fica travado e explica o que fazer.
+    Se o aparelho **perder** o bloqueio de tela com o bloqueio do app ligado, o app se desliga em
+    vez de trancar a pessoa para fora (só quando o aparelho garante que não suporta; um erro do
+    plugin mantém tudo trancado).
+  - **Código:** `lib/state/app_lock.dart` (estado, carência e regras; atrás de `Authenticator`, que
+    os testes trocam por `test/fake_authenticator.dart`), `lib/ui/lock/app_lock_gate.dart` (a tela
+    de bloqueio e a capa, acima do `Navigator`) e `lib/ui/home/app_lock_card.dart`.
+  - **Android:** `MainActivity` é `FlutterFragmentActivity`, a permissão `USE_BIOMETRIC` está no
+    manifesto e os temas anteriores ao Android 12 têm pai AppCompat (sem isso o diálogo
+    biométrico quebra no Android 8 ou anterior). **iOS:** `NSFaceIDUsageDescription` no
+    `Info.plist`, em inglês (traduzir exige `InfoPlist.strings` no projeto Xcode). Não foi
+    testado em aparelho iOS (sem Mac): vale conferir Face ID e Touch ID no TestFlight.
 - **Histórico.** Registrar o mesmo período duas vezes atualiza o registro em vez de duplicar
   (o original duplicava). A identidade do registro é a data de início. Registrar uma data a menos
   de 8 dias de um registro corrige esse registro (e mantém a anotação) em vez de criar outro,

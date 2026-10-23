@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
+import 'dot_grid.dart';
 
 /// Destaque coral do topo (estado de hoje, termos). O texto é branco e o contraste
 /// sobre o degradê é só ~3,4:1 a 3,8:1: use apenas texto grande (título ≥ 24 px, subtítulo
@@ -33,11 +34,14 @@ class HeroBanner extends StatelessWidget {
             child: Stack(
               children: [
                 // Eco do ícone: grade de pontos com um vazado, só decoração.
-                const Positioned(
+                Positioned(
                   right: -18,
                   top: -18,
                   child: ExcludeSemantics(
-                    child: CustomPaint(size: Size(118, 86), painter: _DotGridPainter()),
+                    child: CustomPaint(
+                      size: _dots.size,
+                      painter: _dots,
+                    ),
                   ),
                 ),
                 Padding(
@@ -69,38 +73,13 @@ class HeroBanner extends StatelessWidget {
     );
   }
 
+  static final _dots = DotGridPainter(
+    color: Colors.white.withValues(alpha: decorationAlpha),
+    radius: 11,
+    gap: 10,
+  );
+
   /// Opacidade dos pontos. Com texto grande por cima (fonte ampliada), o branco sobre o
   /// ponto precisa seguir ≥ 3:1: `contrast_test.dart` confere esse valor.
   static const decorationAlpha = 0.10;
-}
-
-class _DotGridPainter extends CustomPainter {
-  const _DotGridPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    const radius = 11.0, gap = 10.0;
-    final fill = Paint()..color = Colors.white.withValues(alpha: HeroBanner.decorationAlpha);
-    final ring = Paint()
-      ..color = Colors.white.withValues(alpha: HeroBanner.decorationAlpha)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-
-    for (var row = 0; row < 3; row++) {
-      for (var col = 0; col < 4; col++) {
-        final center = Offset(
-          radius + col * (2 * radius + gap),
-          radius + row * (2 * radius + gap),
-        );
-        if (row == 1 && col == 2) {
-          canvas.drawCircle(center, radius - 1.5, ring);
-        } else {
-          canvas.drawCircle(center, radius, fill);
-        }
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

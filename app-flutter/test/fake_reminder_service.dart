@@ -8,6 +8,9 @@ class FakeReminderService implements ReminderService {
   /// O que o diálogo de permissão responde quando a pessoa liga os lembretes.
   bool grantOnRequest = true;
 
+  /// O plugin dá erro ao pedir a permissão (como no release sem o ícone das notificações).
+  bool throwOnRequest = false;
+
   int permissionRequests = 0;
   int cancelCalls = 0;
 
@@ -24,6 +27,7 @@ class FakeReminderService implements ReminderService {
   @override
   Future<bool> requestPermission() async {
     permissionRequests++;
+    if (throwOnRequest) throw StateError('plugin quebrou');
     if (grantOnRequest) allowed = true;
     return grantOnRequest;
   }

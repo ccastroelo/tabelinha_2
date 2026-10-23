@@ -22,7 +22,11 @@ class LocalNotificationsService implements ReminderService {
   Future<void>? _initialized;
 
   /// A permissão só é pedida quando a pessoa liga os lembretes, e não ao abrir o app.
-  Future<void> _ensureInitialized() => _initialized ??= _plugin.initialize(
+  ///
+  /// Se a inicialização falhar, a falha não fica guardada: a próxima chamada tenta de novo, em
+  /// vez de todas falharem para sempre com o mesmo erro.
+  Future<void> _ensureInitialized() => _initialized ??= _plugin
+          .initialize(
         settings: const InitializationSettings(
           android: AndroidInitializationSettings(_androidIcon),
           iOS: DarwinInitializationSettings(
@@ -31,7 +35,11 @@ class LocalNotificationsService implements ReminderService {
             requestSoundPermission: false,
           ),
         ),
-      );
+      )
+          .then<void>((_) {}, onError: (Object error, StackTrace stack) {
+        _initialized = null;
+        return Future<void>.error(error, stack);
+      });
 
   AndroidFlutterLocalNotificationsPlugin? get _android =>
       _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();

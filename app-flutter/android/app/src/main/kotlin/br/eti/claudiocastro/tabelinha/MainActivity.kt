@@ -1,5 +1,7 @@
 package br.eti.claudiocastro.tabelinha
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity : FlutterActivity()
+// O bloqueio do app (local_auth) mostra a tela biométrica do sistema como um fragmento, e
+// isso exige uma FragmentActivity.
+class MainActivity : FlutterFragmentActivity()

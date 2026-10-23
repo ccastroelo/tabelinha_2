@@ -19,6 +19,7 @@ class CycleRepository {
   static const _kCycleLength = 'cycleLength';
   static const _kPeriodLength = 'periodLength';
   static const _kAutoCycleLength = 'autoCycleLength';
+  static const _kAppLockEnabled = 'appLockEnabled';
   static const _kRemindersEnabled = 'remindersEnabled';
   static const _kReminderHour = 'reminderHour';
   static const _kReminderMinute = 'reminderMinute';
@@ -71,6 +72,10 @@ class CycleRepository {
     await _prefs.setBool(_kReminderFertile, settings.fertile);
     await _prefs.setBool(_kReminderOvulation, settings.ovulation);
   }
+
+  bool loadAppLockEnabled() => _prefs.getBool(_kAppLockEnabled) ?? false;
+
+  Future<void> saveAppLockEnabled(bool enabled) => _prefs.setBool(_kAppLockEnabled, enabled);
 
   DateTime? loadTermsAcceptedAt() =>
       DateTime.tryParse(_prefs.getString(_kTermsAcceptedAt) ?? '');

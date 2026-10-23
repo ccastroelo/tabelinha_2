@@ -15,6 +15,13 @@ flutter test --no-pub
 - `flutter build` / `flutter run` (qualquer coisa que chame o Gradle) só funciona no painel
   de Terminal do app (`run_in_terminal`, com `cwd` absoluto em `app-flutter`). No shell do
   agente o Gradle falha com "Unable to establish loopback connection".
+- **O build de debug não passa pelo R8; o de release, sim.** Antes de qualquer versão Android,
+  rode `flutter build apk --release` num emulador ou aparelho e use o app (abrir, ligar os
+  lembretes, ligar o bloqueio). Isso já pegou dois defeitos que o debug esconde: o
+  `shared_preferences_android 2.5.1` quebrava na abertura (corrigido na 2.5.2; o `pubspec.lock`
+  fixava a 2.5.1) e o ícone das notificações era apagado pelo encolhimento de recursos
+  (`android/app/src/main/res/raw/keep.xml` o preserva). Recurso que o plugin procura por
+  **nome** (ícone, som) precisa de uma linha no `keep.xml`.
 - Depois de rodar `flutter pub get`/build, `pubspec.lock` muda por causa de pacotes presos ao
   SDK. Não commite essa mudança: `git checkout -- app-flutter/pubspec.lock`.
 - Depois de rodar `flutter_launcher_icons` ou `flutter_native_splash`, reverta
@@ -43,6 +50,15 @@ Notificações locais, opcionais e desligadas por padrão, sem servidor. Quais a
 (`lib/data/`), então testes usam `test/fake_reminder_service.dart` e nunca o plugin. Se o app
 passar a mandar qualquer dado para fora, a política de privacidade (`store/privacy-policy.html`)
 e o questionário de privacidade da loja precisam mudar junto.
+
+## Bloqueio do app
+
+Opcional, com a autenticação do próprio aparelho (`local_auth`); o app não guarda senha. A regra
+fica em `AppLock` (`lib/state/app_lock.dart`), atrás de `Authenticator`: testes usam
+`test/fake_authenticator.dart`. Duas regras que não se quebram: um erro do plugin nunca abre o app
+nem desliga o bloqueio, e o aparelho sem bloqueio de tela nunca deixa a pessoa trancada para fora.
+Testar no emulador exige um PIN (`adb shell locksettings set-pin 1234`; depois
+`locksettings clear --old 1234`); a tela de identificação do sistema sai preta no `screencap`.
 
 ## Visual: direção "Acolhedor"
 

@@ -166,7 +166,14 @@ class AppController extends ChangeNotifier {
       await _saveReminders(_reminders.copyWith(enabled: false));
       return;
     }
-    final granted = await _reminderService.requestPermission();
+    // Um erro do plugin conta como "não deu": a tela explica, em vez de a exceção estourar no
+    // toque do interruptor.
+    var granted = false;
+    try {
+      granted = await _reminderService.requestPermission();
+    } catch (error) {
+      debugPrint('Lembretes: $error');
+    }
     _remindersBlocked = !granted;
     if (granted) {
       await _saveReminders(_reminders.copyWith(enabled: true));

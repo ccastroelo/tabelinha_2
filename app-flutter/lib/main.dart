@@ -7,9 +7,11 @@ import 'package:flutter/services.dart';
 import 'app.dart';
 import 'data/cycle_repository.dart';
 import 'data/legacy_importer.dart';
+import 'data/local_auth_authenticator.dart';
 import 'data/local_notifications_service.dart';
 import 'data/reminder_service.dart';
 import 'state/app_controller.dart';
+import 'state/app_lock.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,5 +37,14 @@ Future<void> main() async {
   // Reagenda os avisos com o dia de hoje; a primeira tela não espera por isso.
   unawaited(controller.syncReminders());
 
-  runApp(TabelinhaApp(controller: controller));
+  // Com o bloqueio ligado, o app já nasce trancado: nada aparece antes de se identificar.
+  final lock = AppLock(
+    repository: repository,
+    authenticator: switch (defaultTargetPlatform) {
+      TargetPlatform.android || TargetPlatform.iOS => LocalAuthAuthenticator(),
+      _ => const NoAuthenticator(),
+    },
+  );
+
+  runApp(TabelinhaApp(controller: controller, lock: lock));
 }

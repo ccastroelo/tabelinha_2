@@ -184,6 +184,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reminderOvulationBody => 'Hoy es tu día probable de ovulación.';
 
   @override
+  String get appLockTitle => 'Bloqueo de la app';
+
+  @override
+  String get appLockHintOff =>
+      'Pide la huella, el rostro o el código del dispositivo para abrir la app.';
+
+  @override
+  String get appLockHintOn =>
+      'La app pide la huella, el rostro o el código del dispositivo al abrirse y tras pasar más de medio minuto fuera.';
+
+  @override
+  String get appLockUnavailable =>
+      'Para usar el bloqueo, primero define un bloqueo de pantalla (PIN, patrón, huella o rostro) en los ajustes del dispositivo.';
+
+  @override
+  String get appLockDisabledBySystem =>
+      'El bloqueo se desactivó porque el dispositivo se quedó sin bloqueo de pantalla.';
+
+  @override
+  String get appLockReasonOpen => 'Confirma que eres tú para abrir la app.';
+
+  @override
+  String get appLockReasonEnable =>
+      'Confirma que eres tú para activar el bloqueo.';
+
+  @override
+  String get appLockReasonDisable =>
+      'Confirma que eres tú para desactivar el bloqueo.';
+
+  @override
+  String get lockScreenBody =>
+      'La app está bloqueada. Confirma que eres tú para ver el calendario.';
+
+  @override
+  String get lockScreenButton => 'Desbloquear';
+
+  @override
+  String get lockScreenFailed => 'No se pudo confirmar. Inténtalo de nuevo.';
+
+  @override
   String get setupTitle => 'Empecemos';
 
   @override

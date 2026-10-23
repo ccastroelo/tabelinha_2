@@ -246,6 +246,18 @@ void main() {
       expect(service.schedules, isEmpty);
     });
 
+    test('um erro do plugin ao pedir a permissão não estoura: fica desligado e avisa a tela', () async {
+      final (controller, service) = await setup();
+      service.throwOnRequest = true;
+
+      // Não pode lançar: quem chama é o toque no interruptor.
+      await controller.setRemindersEnabled(true);
+
+      expect(controller.reminders.enabled, isFalse);
+      expect(controller.remindersBlocked, isTrue);
+      expect(service.schedules, isEmpty);
+    });
+
     test('mudar o ciclo, o histórico ou os avisos reagenda', () async {
       final (controller, service) = await setup();
       await controller.setRemindersEnabled(true);

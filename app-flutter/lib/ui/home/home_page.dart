@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../state/app_controller.dart';
 import '../help/help_page.dart';
 import '../history/history_page.dart';
+import 'app_lock_card.dart';
 import 'calendar_card.dart';
 import 'cycle_settings_card.dart';
 import 'reminders_card.dart';
@@ -133,6 +134,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 const CycleSettingsCard(),
                 const SizedBox(height: 12),
                 const RemindersCard(),
+                const SizedBox(height: 12),
+                const AppLockCard(),
                 const SizedBox(height: 16),
                 _EstimateNote(text: l10n.estimateNote),
               ],

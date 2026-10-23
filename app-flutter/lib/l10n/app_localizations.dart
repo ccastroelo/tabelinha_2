@@ -352,6 +352,72 @@ abstract class AppLocalizations {
   /// **'Hoje é o dia provável da ovulação.'**
   String get reminderOvulationBody;
 
+  /// No description provided for @appLockTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bloqueio do app'**
+  String get appLockTitle;
+
+  /// No description provided for @appLockHintOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Peça a digital, o rosto ou o código do aparelho para abrir o app.'**
+  String get appLockHintOff;
+
+  /// No description provided for @appLockHintOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'O app pede a digital, o rosto ou o código do aparelho ao abrir e depois de ficar mais de meio minuto fora.'**
+  String get appLockHintOn;
+
+  /// No description provided for @appLockUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Para usar o bloqueio, defina antes um bloqueio de tela (PIN, padrão, digital ou rosto) nos ajustes do aparelho.'**
+  String get appLockUnavailable;
+
+  /// No description provided for @appLockDisabledBySystem.
+  ///
+  /// In pt, this message translates to:
+  /// **'O bloqueio foi desligado porque o aparelho ficou sem bloqueio de tela.'**
+  String get appLockDisabledBySystem;
+
+  /// No description provided for @appLockReasonOpen.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme que é você para abrir o app.'**
+  String get appLockReasonOpen;
+
+  /// No description provided for @appLockReasonEnable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme que é você para ligar o bloqueio.'**
+  String get appLockReasonEnable;
+
+  /// No description provided for @appLockReasonDisable.
+  ///
+  /// In pt, this message translates to:
+  /// **'Confirme que é você para desligar o bloqueio.'**
+  String get appLockReasonDisable;
+
+  /// No description provided for @lockScreenBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'O app está bloqueado. Confirme que é você para ver o calendário.'**
+  String get lockScreenBody;
+
+  /// No description provided for @lockScreenButton.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desbloquear'**
+  String get lockScreenButton;
+
+  /// No description provided for @lockScreenFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível confirmar. Tente de novo.'**
+  String get lockScreenFailed;
+
   /// No description provided for @setupTitle.
   ///
   /// In pt, this message translates to:

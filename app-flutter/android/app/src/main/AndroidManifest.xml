@@ -3,6 +3,9 @@
          notificações (POST_NOTIFICATIONS) vem do próprio plugin. Sem alarme exato de propósito:
          o aviso pode atrasar uns minutos, e o app não precisa da permissão de alarmes exatos. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Bloqueio do app: a digital ou o rosto do próprio aparelho (o código de tela não precisa
+         de permissão). O app não vê a biometria, só recebe "sim" ou "não" do sistema. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
 
     <application
         android:label="Tabelinha"
