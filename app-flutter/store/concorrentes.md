@@ -44,18 +44,77 @@ quem só quer saber a data provável, esse é o concorrente mais difícil de bat
 nenhum download. A estimativa retrospectiva de ovulação por temperatura do pulso exige Apple
 Watch Series 8 ou mais novo.
 
-## Comparação
+## Comparação de funcionalidades
 
-| | Conta | Onde ficam os dados | Modelo | Registra | Bloqueio |
-| --- | --- | --- | --- | --- | --- |
-| **Tabelinha** | não | só no aparelho | grátis, sem anúncio | datas + anotação | biometria/código do aparelho |
-| Flo | sim | nuvem | freemium | sintomas, humor, gravidez | PIN próprio |
-| Clue | sim | nuvem | freemium (US$ ~40/ano) | sintomas, humor | PIN próprio |
-| Meu Calendário e clones | opcional | nuvem + anúncios | grátis com anúncio | sintomas, humor | PIN próprio |
-| drip | não | só no aparelho | grátis, aberto | datas, temperatura, muco | senha |
-| Euki | não | só no aparelho | grátis, aberto | datas, sintomas | PIN + PIN de coação |
-| Mooneva | não | só no aparelho | grátis, aberto | datas, sintomas | PIN + ícone disfarçado |
-| Apple Saúde | conta Apple | aparelho + iCloud | grátis, embutido | datas, sintomas | o do aparelho |
+`✓` tem · `—` não tem · `pago` só na assinatura · `?` não achei fonte confiável. Colunas:
+**Tab** Tabelinha · **Flo** · **Clue** · **Clones** a família "Period Calendar / Meu Calendário" ·
+**drip** · **Euki** · **Moon** Mooneva · **Apple** o Controle do Ciclo do Apple Saúde.
+
+| | Tab | Flo | Clue | Clones | drip | Euki | Moon | Apple |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| **Previsão da menstruação** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Janela fértil e ovulação** | ✓ | ✓ | ✓ | ✓ | ✓ | ? | ✓ | ✓ |
+| **Previsão pela média do histórico** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ? | ✓ |
+| **Previsão além de 1 ciclo** | ✓ | ? | pago | ✓ | ? | ? | ? | ✓ |
+| **Método sintotérmico (temperatura + muco)** | — | — | — | parcial | ✓ | — | — | parcial |
+| **Registro de fluxo** | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Sintomas e humor** | — | ✓ | ✓ (200+) | ✓ (58) | ✓ | ✓ | ✓ | básico |
+| **Anotação livre por ciclo** | ✓ | ? | ✓ | ? | ? | ✓ | ? | — |
+| **Sexo e contracepção** | — | ✓ | ✓ | ✓ | ✓ | ✓ | ? | ✓ |
+| **Lembrete de pílula** | — | ✓ | ? | ✓ | — | ✓ | ? | — |
+| **Lembretes do ciclo** | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ? | ✓ |
+| **Modo gravidez** | — | ✓ | ✓ / pago | ✓ | — | ✓ | — | — |
+| **Modo perimenopausa** | — | ✓ | pago | ? | — | ? | ? | — |
+| **Estatísticas do ciclo** | — | ✓ | ✓ / pago | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Exportar dados / relatório** | só imagem | ? | pago | ? | ✓ | ? | ✓ | via Saúde |
+| **Importar de outro app** | só do app antigo | ? | ? | ? | ✓ (CSV) | ? | ? | — |
+| **Conteúdo educativo** | ajuda curta | ✓ | ✓ / pago | ? | — | ✓ | — | — |
+| **Comunidade / fórum** | — | ✓ | — | — | — | — | — | — |
+| **Apple Watch / wearable** | — | ✓ | ✓ / pago | Wear OS | — | — | — | ✓ |
+| **Widget na tela inicial** | — | ? | ? | ? | ? | ? | ? | ✓ |
+| **Bloqueio do app** | ✓ (aparelho) | ✓ (PIN) | ? | ✓ (PIN) | ✓ (senha) | ✓ (PIN) | ✓ (PIN) | ✓ (aparelho) |
+| **PIN de coação / tela falsa** | — | — | — | — | — | ✓ | — | — |
+| **Ícone disfarçado** | — | — | — | — | — | — | ✓ | — |
+| **Notificação discreta** | ✓ | ? | ? | ✓ | ? | ✓ | ? | ? |
+| **Funciona sem internet** | ✓ | — | — | — | ✓ | ✓ | ✓ | ✓ |
+| **Sem conta** | ✓ | anônimo | — | ✓ | ✓ | ✓ | ✓ | conta Apple |
+| **Dados só no aparelho** | ✓ | — | — | — | ✓ | ✓ | ✓ | + iCloud |
+| **Código aberto** | — | — | — | — | ✓ | ✓ | ✓ | — |
+| **Sem anúncio** | ✓ | ✓ | ✓ | — | ✓ | ✓ | ✓ | ✓ |
+| **Tudo de graça** | ✓ | — | — | — | ✓ | ✓ | ✓ | ✓ |
+| **Português, inglês e espanhol** | ✓ | ✓ | ✓ | ✓ | ? | ? | ? | ✓ |
+
+Lendo a tabela por coluna: o Tabelinha ganha no bloco de baixo (privacidade, custo, offline) e perde
+no bloco do meio (registro de sintomas, estatística, exportação). Nenhum concorrente ganha os dois
+blocos — os de privacidade também são pobres de função, e os completos vivem de conta e nuvem. É
+esse vão que o Tabelinha ocupa.
+
+### O que os grandes cobram
+
+Serve para saber o que é "de graça no mercado" e o que é isca de assinatura.
+
+- **Clue Plus:** previsão de menstruação de 6 meses, análise de sintomas recorrentes, modo
+  perimenopausa, categorias de gravidez, 10 categorias extras de registro (sono, urina,
+  suplementos), etiquetas personalizadas ilimitadas, resumo mensal por e-mail, acesso completo
+  aos artigos e integração com wearables.
+- **Flo Premium:** análises diárias personalizadas e ferramentas avançadas sobre o básico, que já
+  inclui previsão, registro de sintomas, histórico e o Modo Anônimo (de 2022, resposta à crise de
+  privacidade).
+- **Stardust:** o histórico além de 6 meses é pago.
+- **Natural Cycles:** não tem camada grátis, e é o único com liberação da FDA como contraceptivo
+  (exige termômetro e medição diária).
+
+### O que as pessoas reclamam
+
+Uma análise de avaliações de 1 a 3 estrelas em seis apps do nicho distribuiu as queixas assim:
+privacidade e compartilhamento de dados **28%**, precisão da previsão **19%**, assinatura
+agressiva **16%**, interface de registro de sintomas **12%**, excesso de notificação e de conteúdo
+"bem-estar" **10%**, travamento e erro de sincronização **8%**. É uma análise só, de um publisher
+editorial, então vale como direção e não como medida.
+
+Três dessas seis queixas — privacidade, assinatura e notificação — o Tabelinha já não tem por
+construção. Uma (travamento de sincronização) não existe porque não há sincronização. Sobram
+**precisão** e **interface de registro**, que são justamente as lacunas da tabela acima.
 
 ## Onde o Tabelinha está bem
 
@@ -119,3 +178,9 @@ imagem da loja — hoje a descrição já diz, mas o subtítulo não é o lugar 
 - [Superrr — Drip, Feminist Tech Fellow](https://superrr.net/feministtech/fellow/drip/)
 - [Apple — Track your period with Cycle Tracking](https://support.apple.com/120356)
 - [Canaltech — Melhores aplicativos para acompanhar ciclo menstrual](https://canaltech.com.br/apps/melhores-aplicativos-para-acompanhar-ciclo-menstrual/)
+- [Wikipédia — Flo (app)](https://en.wikipedia.org/wiki/Flo_(app)) (versão grátis, Modo Anônimo, processos)
+- [Clue — What's included in Clue Plus](https://support.helloclue.com/hc/en-us/articles/15007279508637-What-s-included-in-Clue-Plus) e [Android Authority — Clue app](https://androidauthority.com/clue-app-3046459)
+- [unstar.app — Period tracking apps ranked 2026](https://unstar.app/blog/flo-clue-stardust-apple-health-period-tracking-apps-ranked-2026) (a distribuição das queixas)
+- [Mozilla — Privacy Review: Euki](https://www.mozillafoundation.org/pt-BR/nothing-personal/euki-privacy-review/)
+- [drip — Perguntas frequentes](https://dripapp.org/faq.html) (método sintotérmico e importação por CSV)
+- [AlternativeTo — Period Calendar](https://alternativeto.net/software/period-calendar/about) (a família de clones)
