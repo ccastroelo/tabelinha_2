@@ -84,7 +84,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.appTitle),
+        // Ao lado dos três botões o nome não cabe em todo idioma ("Calendario de Fertilidad"):
+        // encolhe um pouco em vez de terminar em reticências.
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(l10n.appTitle),
+        ),
         actions: [
           Builder(
             builder: (buttonContext) => IconButton.filledTonal(

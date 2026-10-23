@@ -180,6 +180,39 @@ e o `flutter_native_splash` reformata o `Info.plist`.
 Validado no emulador Android (ícone adaptativo e splash). O lado iOS (catálogo de ícones, 
 `LaunchScreen.storyboard`) foi gerado e revisado, mas não rodado.
 
+## Imagens da App Store
+
+`flutter test tool/generate_store_screenshots_test.dart` gera 54 imagens em
+`store/ios/screenshots/<idioma>/<aparelho>/`: 6 telas × 3 idiomas × 3 aparelhos. Leva uns 30 s.
+
+| Pasta        | Tamanho   | Onde subir no App Store Connect                                         |
+| ------------ | --------- | ----------------------------------------------------------------------- |
+| `iphone-6.3` | 1206×2622 | iPhone 6,1" ou 6,3" (a loja aceita também 1179×2556, 2556×1179 e 2622×1206) |
+| `iphone-6.9` | 1320×2868 | iPhone 6,9"                                                             |
+| `ipad-13`    | 2064×2752 | iPad 13" (o app é universal, então a loja exige)                        |
+
+Para um tamanho de iPhone novo, acrescente um `_Device` em `_devices` no gerador. As prévias
+em vídeo (1920×886 ou 886×1920) não são geradas aqui: são vídeos, não telas.
+
+| Pasta   | Localização na loja                                           |
+| ------- | ------------------------------------------------------------- |
+| `pt-BR` | Português (Brasil)                                            |
+| `en-US` | Inglês (EUA)                                                  |
+| `es-ES` | Espanhol (Espanha); serve também para o espanhol do México    |
+
+As telas, na ordem: `01-today`, `02-calendar`, `03-settings`, `04-records`, `05-notes`, `06-dark`.
+
+- **São o app de verdade.** Cada imagem é a tela renderizada pelo próprio app, com a Nunito, a
+  plataforma iOS e dados de exemplo numa data fixa (17/10/2026), por isso saem iguais a cada
+  execução. A barra de status (9:41) e o indicador de início são desenhados por cima.
+- **Moldura e texto** ficam em `tool/generate_store_screenshots_test.dart`: os títulos e subtítulos
+  de cada idioma em `_langs`, as telas em `_shots` e as anotações de exemplo em `_Lang.notes`.
+- **iPad.** A tela é renderizada em 768×1024 pt (proporção 3:4 de qualquer iPad) para a coluna do
+  app preencher a moldura; em 1032×1376 pt sobrava fundo vazio dos lados.
+- **PNG de 24 bits, sem transparência.** O gerador codifica o PNG ele mesmo, porque o do `dart:ui`
+  sai com canal alfa.
+- Os textos de marketing não prometem eficácia contraceptiva, que o app também não oferece.
+
 ## CI/CD (Codemagic)
 
 O `codemagic.yaml` fica na **raiz do repositório** (`../codemagic.yaml`; o Codemagic só o
