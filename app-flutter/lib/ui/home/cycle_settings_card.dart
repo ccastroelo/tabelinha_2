@@ -6,6 +6,7 @@ import '../../state/app_controller.dart';
 import '../formatters.dart';
 import '../theme.dart';
 import '../widgets/soft_card.dart';
+import '../widgets/stepper_row.dart';
 
 /// Abre o seletor de data e grava o primeiro dia do ciclo.
 Future<void> pickCycleStart(BuildContext context, AppController controller) async {
@@ -47,9 +48,10 @@ class CycleSettingsCard extends StatelessWidget {
             onTap: () => pickCycleStart(context, controller),
           ),
           divider,
-          _StepperRow(
+          StepperRow(
             label: l10n.cycleLength,
             value: controller.effectiveCycleLength,
+            valueLabel: l10n.daysCount(controller.effectiveCycleLength),
             min: CycleSettings.minCycleLength,
             max: CycleSettings.maxCycleLength,
             // Com a média em uso, o valor não é da pessoa: para mudar, desliga o cálculo.
@@ -62,9 +64,10 @@ class CycleSettingsCard extends StatelessWidget {
             onChanged: controller.setAutoCycleLength,
           ),
           divider,
-          _StepperRow(
+          StepperRow(
             label: l10n.periodLength,
             value: settings.periodLength,
+            valueLabel: l10n.daysCount(settings.periodLength),
             min: CycleSettings.minPeriodLength,
             max: CycleSettings.maxPeriodLength,
             onChanged: controller.setPeriodLength,
@@ -170,85 +173,6 @@ class _AutoCycleRow extends StatelessWidget {
         status,
         style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
       ),
-    );
-  }
-}
-
-class _StepperRow extends StatelessWidget {
-  const _StepperRow({
-    required this.label,
-    required this.value,
-    required this.min,
-    required this.max,
-    required this.onChanged,
-    this.enabled = true,
-  });
-
-  final String label;
-  final int value;
-  final int min;
-  final int max;
-  final ValueChanged<int> onChanged;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final text = Theme.of(context).textTheme;
-
-    final labelText = Text(label, style: text.titleSmall?.copyWith(fontWeight: FontWeight.w700));
-    final controls = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton.filledTonal(
-          tooltip: l10n.decreaseValue(label),
-          onPressed: enabled && value > min ? () => onChanged(value - 1) : null,
-          icon: const Icon(Icons.remove),
-        ),
-        // Flexible + FittedBox: se faltar largura o valor encolhe em vez de estourar a linha.
-        Flexible(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: 72),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Semantics(
-                liveRegion: true,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    l10n.daysCount(value),
-                    textAlign: TextAlign.center,
-                    style: text.titleSmall,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        IconButton.filledTonal(
-          tooltip: l10n.increaseValue(label),
-          onPressed: enabled && value < max ? () => onChanged(value + 1) : null,
-          icon: const Icon(Icons.add),
-        ),
-      ],
-    );
-
-    // Com fonte muito grande não sobra largura para rótulo e botões lado a lado.
-    final stacked = MediaQuery.textScalerOf(context).scale(16) > 22.4;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: stacked
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [labelText, const SizedBox(height: 4), controls],
-            )
-          : Row(
-              children: [
-                Expanded(child: labelText),
-                const SizedBox(width: 12),
-                controls,
-              ],
-            ),
     );
   }
 }

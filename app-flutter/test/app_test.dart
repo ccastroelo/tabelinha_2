@@ -7,12 +7,21 @@ import 'package:tabelinha/core/cycle_calculator.dart';
 import 'package:tabelinha/data/cycle_repository.dart';
 import 'package:tabelinha/state/app_controller.dart';
 
+import 'fake_reminder_service.dart';
+
 /// Quarta, 21/10/2026 — dia 17 de um ciclo de 28 dias iniciado em 5/10.
 final _now = DateTime(2026, 10, 21, 15, 30);
 
-Future<AppController> _controller([Map<String, Object> initial = const {}]) async {
+Future<AppController> _controller([
+  Map<String, Object> initial = const {},
+  FakeReminderService? reminders,
+]) async {
   SharedPreferences.setMockInitialValues(initial);
-  return AppController(await CycleRepository.open(), now: () => _now);
+  return AppController(
+    await CycleRepository.open(),
+    now: () => _now,
+    reminderService: reminders,
+  );
 }
 
 Map<String, Object> _configured() => {
@@ -211,6 +220,12 @@ void main() {
     IconButton cycleLengthPlus(WidgetTester tester) =>
         tester.widget(find.widgetWithIcon(IconButton, Icons.add).first);
 
+    /// O interruptor do cálculo pelo histórico (a tela tem outros, como o dos lembretes).
+    final autoSwitch = find.descendant(
+      of: find.widgetWithText(SwitchListTile, 'Calculate from history'),
+      matching: find.byType(Switch),
+    );
+
     test('sem histórico suficiente vale a duração definida', () async {
       final controller = await _controller(_configured());
       expect(controller.estimate, isNull);
@@ -274,8 +289,8 @@ void main() {
     testWidgets('sem histórico a tela explica quando a média passa a valer', (tester) async {
       await _pump(tester, await _controller(_configured()));
       await tester.scrollUntilVisible(find.textContaining('With 3 periods'), 200);
-      expect(find.byType(Switch), findsOneWidget);
-      expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+      expect(autoSwitch, findsOneWidget);
+      expect(tester.widget<Switch>(autoSwitch).value, isTrue);
       // Sem média, os botões do ciclo seguem livres.
       expect(cycleLengthPlus(tester).onPressed, isNotNull);
     });
@@ -296,7 +311,7 @@ void main() {
       final controller = await withHistory();
       await _pump(tester, controller);
 
-      await _tapVisible(tester, find.byType(Switch));
+      await _tapVisible(tester, autoSwitch);
       expect(controller.settings.autoCycleLength, isFalse);
       expect(find.text('Using the length you set above.'), findsOneWidget);
       expect(cycleLengthPlus(tester).onPressed, isNotNull);
@@ -305,13 +320,106 @@ void main() {
       expect(controller.settings.cycleLength, 28);
       expect(find.text('28 days'), findsOneWidget);
 
-      await _tapVisible(tester, find.byType(Switch));
+      await _tapVisible(tester, autoSwitch);
       expect(controller.settings.autoCycleLength, isTrue);
       expect(controller.estimate!.cycleLength, 27);
       expect(
         find.text('Using 27 days, the average of your last 2 cycles.'),
         findsOneWidget,
       );
+    });
+  });
+
+  group('lembretes', () {
+    Finder tile(String title) => find.widgetWithText(SwitchListTile, title);
+    bool isOn(WidgetTester tester, String title) =>
+        tester.widget<SwitchListTile>(tile(title)).value;
+
+    testWidgets('começam desligados, com a dica de que nada sai do aparelho', (tester) async {
+      await _pump(tester, await _controller(_configured(), FakeReminderService()));
+      await tester.scrollUntilVisible(
+        find.text('Alerts on this device only. Nothing is sent anywhere.'),
+        200,
+      );
+      expect(isOn(tester, 'Reminders'), isFalse);
+      expect(find.text('Remind in advance'), findsNothing);
+    });
+
+    testWidgets('ligar pede a permissão e mostra as opções', (tester) async {
+      final service = FakeReminderService();
+      final controller = await _controller(_configured(), service);
+      await _pump(tester, controller);
+
+      await _tapVisible(tester, tile('Reminders'));
+
+      expect(service.permissionRequests, 1);
+      expect(controller.reminders.enabled, isTrue);
+      expect(isOn(tester, 'Reminders'), isTrue);
+      expect(find.textContaining('Alerts on this device, at 9:00'), findsOneWidget);
+      expect(find.text('Time'), findsOneWidget);
+      expect(find.text('Remind in advance'), findsOneWidget);
+      expect(find.text('2 days before'), findsOneWidget);
+      expect(find.text('Start of the fertile period'), findsOneWidget);
+      expect(find.text('Ovulation day'), findsOneWidget);
+    });
+
+    testWidgets('permissão negada: o interruptor não liga e a tela explica', (tester) async {
+      final service = FakeReminderService()
+        ..allowed = false
+        ..grantOnRequest = false;
+      final controller = await _controller(_configured(), service);
+      await _pump(tester, controller);
+
+      await _tapVisible(tester, tile('Reminders'));
+
+      expect(controller.reminders.enabled, isFalse);
+      expect(isOn(tester, 'Reminders'), isFalse);
+      expect(
+        find.text('Notifications are blocked for the app. Turn them on in the system settings.'),
+        findsOneWidget,
+      );
+      expect(find.text('Start of the fertile period'), findsNothing);
+    });
+
+    testWidgets('a antecedência some quando o aviso da menstruação é desligado', (tester) async {
+      final controller = await _controller(_configured(), FakeReminderService());
+      await _pump(tester, controller);
+      await _tapVisible(tester, tile('Reminders'));
+      expect(find.text('Remind in advance'), findsOneWidget);
+
+      await _tapVisible(tester, tile('Next period'));
+      expect(controller.reminders.period, isFalse);
+      expect(find.text('Remind in advance'), findsNothing);
+    });
+
+    testWidgets('os botões mudam a antecedência, de 0 a 7 dias', (tester) async {
+      final controller = await _controller(_configured(), FakeReminderService());
+      await _pump(tester, controller);
+      await _tapVisible(tester, tile('Reminders'));
+
+      await _tapVisible(tester, find.byTooltip('Increase: Remind in advance'));
+      expect(controller.reminders.periodDaysBefore, 3);
+      expect(find.text('3 days before'), findsOneWidget);
+
+      await controller.updateReminders(controller.reminders.copyWith(periodDaysBefore: 7));
+      await tester.pumpAndSettle();
+      final plus = find.ancestor(
+        of: find.byTooltip('Increase: Remind in advance'),
+        matching: find.byType(IconButton),
+      );
+      expect(tester.widget<IconButton>(plus).onPressed, isNull);
+    });
+
+    testWidgets('desligar esconde as opções e cancela os avisos', (tester) async {
+      final service = FakeReminderService();
+      final controller = await _controller(_configured(), service);
+      await _pump(tester, controller);
+      await _tapVisible(tester, tile('Reminders'));
+      await _tapVisible(tester, tile('Reminders'));
+
+      expect(controller.reminders.enabled, isFalse);
+      expect(find.text('Remind in advance'), findsNothing);
+      expect(service.cancelCalls, 1);
     });
   });
 
@@ -341,6 +449,18 @@ void main() {
       expect(find.text('Fertile period'), findsWidgets);
 
       await tester.scrollUntilVisible(find.byTooltip('Increase: Period length'), 200);
+      await tester.drag(find.byType(ListView).first, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('contraceptive'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('home com os lembretes ligados', (tester) async {
+      final controller = await _controller(_configured(), FakeReminderService());
+      await controller.setRemindersEnabled(true);
+      await _pump(tester, controller, size: narrow, textScale: 2);
+
+      await tester.scrollUntilVisible(find.text('Ovulation day'), 200);
       await tester.drag(find.byType(ListView).first, const Offset(0, -3000));
       await tester.pumpAndSettle();
       expect(find.textContaining('contraceptive'), findsOneWidget);

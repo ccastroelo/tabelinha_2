@@ -250,6 +250,108 @@ abstract class AppLocalizations {
   /// **'Usando a duração que você definiu acima.'**
   String get autoCycleOff;
 
+  /// No description provided for @remindersTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lembretes'**
+  String get remindersTitle;
+
+  /// No description provided for @remindersHintOff.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avisos no próprio aparelho. Nada é enviado para fora.'**
+  String get remindersHintOff;
+
+  /// No description provided for @remindersHintOn.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avisos no próprio aparelho, às {time}.'**
+  String remindersHintOn(String time);
+
+  /// No description provided for @remindersBlocked.
+  ///
+  /// In pt, this message translates to:
+  /// **'As notificações estão bloqueadas para o app. Ative-as nos ajustes do sistema.'**
+  String get remindersBlocked;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In pt, this message translates to:
+  /// **'Horário'**
+  String get reminderTime;
+
+  /// No description provided for @reminderAdvance.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avisar com antecedência'**
+  String get reminderAdvance;
+
+  /// No description provided for @reminderDaysBefore.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =0{No dia} =1{1 dia antes} other{{count} dias antes}}'**
+  String reminderDaysBefore(int count);
+
+  /// No description provided for @reminderFertileToggle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Início do período fértil'**
+  String get reminderFertileToggle;
+
+  /// No description provided for @reminderOvulationToggle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dia da ovulação'**
+  String get reminderOvulationToggle;
+
+  /// No description provided for @reminderChannelName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Lembretes do ciclo'**
+  String get reminderChannelName;
+
+  /// No description provided for @reminderChannelDescription.
+  ///
+  /// In pt, this message translates to:
+  /// **'Avisos sobre a próxima menstruação, o período fértil e a ovulação.'**
+  String get reminderChannelDescription;
+
+  /// No description provided for @reminderPeriodTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Menstruação a caminho'**
+  String get reminderPeriodTitle;
+
+  /// No description provided for @reminderPeriodBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'{days, plural, =0{Sua menstruação está prevista para hoje. É só uma estimativa.} =1{Sua menstruação está prevista para amanhã. É só uma estimativa.} other{Sua menstruação está prevista para daqui a {days} dias. É só uma estimativa.}}'**
+  String reminderPeriodBody(int days);
+
+  /// No description provided for @reminderFertileTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Período fértil'**
+  String get reminderFertileTitle;
+
+  /// No description provided for @reminderFertileBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu período fértil estimado começa hoje.'**
+  String get reminderFertileBody;
+
+  /// No description provided for @reminderOvulationTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ovulação'**
+  String get reminderOvulationTitle;
+
+  /// No description provided for @reminderOvulationBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje é o dia provável da ovulação.'**
+  String get reminderOvulationBody;
+
   /// No description provided for @setupTitle.
   ///
   /// In pt, this message translates to:

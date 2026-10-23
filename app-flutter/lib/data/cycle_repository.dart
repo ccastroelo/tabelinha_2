@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/cycle_calculator.dart';
 import '../core/date_only.dart';
+import '../core/reminders.dart';
 import 'period_record.dart';
 
 /// Persistência local. Tudo cabe em `shared_preferences`: três números, uma
@@ -18,6 +19,13 @@ class CycleRepository {
   static const _kCycleLength = 'cycleLength';
   static const _kPeriodLength = 'periodLength';
   static const _kAutoCycleLength = 'autoCycleLength';
+  static const _kRemindersEnabled = 'remindersEnabled';
+  static const _kReminderHour = 'reminderHour';
+  static const _kReminderMinute = 'reminderMinute';
+  static const _kReminderDaysBefore = 'reminderDaysBefore';
+  static const _kReminderPeriod = 'reminderPeriod';
+  static const _kReminderFertile = 'reminderFertile';
+  static const _kReminderOvulation = 'reminderOvulation';
   static const _kTermsAcceptedAt = 'termsAcceptedAt';
   static const _kRecords = 'periodRecords';
   static const _kLegacyImported = 'legacyImported';
@@ -40,6 +48,28 @@ class CycleRepository {
     await _prefs.setInt(_kCycleLength, settings.cycleLength);
     await _prefs.setInt(_kPeriodLength, settings.periodLength);
     await _prefs.setBool(_kAutoCycleLength, settings.autoCycleLength);
+  }
+
+  ReminderSettings loadReminderSettings() {
+    return const ReminderSettings().copyWith(
+      enabled: _prefs.getBool(_kRemindersEnabled),
+      hour: _prefs.getInt(_kReminderHour),
+      minute: _prefs.getInt(_kReminderMinute),
+      periodDaysBefore: _prefs.getInt(_kReminderDaysBefore),
+      period: _prefs.getBool(_kReminderPeriod),
+      fertile: _prefs.getBool(_kReminderFertile),
+      ovulation: _prefs.getBool(_kReminderOvulation),
+    );
+  }
+
+  Future<void> saveReminderSettings(ReminderSettings settings) async {
+    await _prefs.setBool(_kRemindersEnabled, settings.enabled);
+    await _prefs.setInt(_kReminderHour, settings.hour);
+    await _prefs.setInt(_kReminderMinute, settings.minute);
+    await _prefs.setInt(_kReminderDaysBefore, settings.periodDaysBefore);
+    await _prefs.setBool(_kReminderPeriod, settings.period);
+    await _prefs.setBool(_kReminderFertile, settings.fertile);
+    await _prefs.setBool(_kReminderOvulation, settings.ovulation);
   }
 
   DateTime? loadTermsAcceptedAt() =>

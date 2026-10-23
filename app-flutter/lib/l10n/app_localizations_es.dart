@@ -109,6 +109,81 @@ class AppLocalizationsEs extends AppLocalizations {
   String get autoCycleOff => 'Usando la duración que definiste arriba.';
 
   @override
+  String get remindersTitle => 'Recordatorios';
+
+  @override
+  String get remindersHintOff =>
+      'Avisos en el propio dispositivo. No se envía nada fuera de él.';
+
+  @override
+  String remindersHintOn(String time) {
+    return 'Avisos en el dispositivo, a las $time.';
+  }
+
+  @override
+  String get remindersBlocked =>
+      'Las notificaciones están bloqueadas para la app. Actívalas en los ajustes del sistema.';
+
+  @override
+  String get reminderTime => 'Hora';
+
+  @override
+  String get reminderAdvance => 'Avisar con antelación';
+
+  @override
+  String reminderDaysBefore(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días antes',
+      one: '1 día antes',
+      zero: 'El mismo día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reminderFertileToggle => 'Inicio del período fértil';
+
+  @override
+  String get reminderOvulationToggle => 'Día de la ovulación';
+
+  @override
+  String get reminderChannelName => 'Recordatorios del ciclo';
+
+  @override
+  String get reminderChannelDescription =>
+      'Avisos sobre tu próxima menstruación, el período fértil y la ovulación.';
+
+  @override
+  String get reminderPeriodTitle => 'Menstruación en camino';
+
+  @override
+  String reminderPeriodBody(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other:
+          'Tu menstruación está prevista dentro de $days días. Es solo una estimación.',
+      one: 'Tu menstruación está prevista para mañana. Es solo una estimación.',
+      zero: 'Tu menstruación está prevista para hoy. Es solo una estimación.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reminderFertileTitle => 'Período fértil';
+
+  @override
+  String get reminderFertileBody => 'Tu período fértil estimado empieza hoy.';
+
+  @override
+  String get reminderOvulationTitle => 'Ovulación';
+
+  @override
+  String get reminderOvulationBody => 'Hoy es tu día probable de ovulación.';
+
+  @override
   String get setupTitle => 'Empecemos';
 
   @override

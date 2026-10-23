@@ -6,10 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../state/app_controller.dart';
 import '../help/help_page.dart';
 import '../history/history_page.dart';
 import 'calendar_card.dart';
 import 'cycle_settings_card.dart';
+import 'reminders_card.dart';
 import 'summary_card.dart';
 
 class HomePage extends StatefulWidget {
@@ -34,10 +36,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  /// Voltar ao app em outro dia: "hoje" precisa ser recalculado.
+  /// Voltar ao app em outro dia: "hoje" precisa ser recalculado, e os lembretes reagendados
+  /// (os avisos futuros dependem de hoje, e a permissão pode ter mudado nos ajustes).
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) setState(() {});
+    if (state != AppLifecycleState.resumed) return;
+    setState(() {});
+    AppScope.of(context).syncReminders();
   }
 
   Future<void> _share(BuildContext buttonContext) async {
@@ -126,6 +131,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 CalendarCard(captureKey: _captureKey),
                 const SizedBox(height: 12),
                 const CycleSettingsCard(),
+                const SizedBox(height: 12),
+                const RemindersCard(),
                 const SizedBox(height: 16),
                 _EstimateNote(text: l10n.estimateNote),
               ],

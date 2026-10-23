@@ -36,6 +36,14 @@ local" ou "faça o push"). Nunca force-push.
   `estimateCycleLength`, `CycleCalculator.known`) só entra por cima disso, e
   `test/history_prediction_test.dart` prova que, com ciclos regulares, dá o mesmo calendário.
 
+## Lembretes
+
+Notificações locais, opcionais e desligadas por padrão, sem servidor. Quais avisos e quando é
+`planReminders` (`lib/core/reminders.dart`, puro); o plugin fica atrás de `ReminderService`
+(`lib/data/`), então testes usam `test/fake_reminder_service.dart` e nunca o plugin. Se o app
+passar a mandar qualquer dado para fora, a política de privacidade (`store/privacy-policy.html`)
+e o questionário de privacidade da loja precisam mudar junto.
+
 ## Visual: direção "Acolhedor"
 
 Cantos bem arredondados, sombra suave, fonte redonda e a identidade coral do ícone.

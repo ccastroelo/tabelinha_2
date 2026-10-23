@@ -1,25 +1,50 @@
+import 'dart:async';
+import 'dart:ui' show Locale, PlatformDispatcher;
+
 import 'package:flutter/widgets.dart';
 
 import '../core/cycle_calculator.dart';
 import '../core/date_only.dart';
+import '../core/reminders.dart';
 import '../data/cycle_repository.dart';
 import '../data/legacy_data.dart';
 import '../data/period_record.dart';
+import '../data/reminder_service.dart';
+import 'reminder_texts.dart';
 
-/// Estado do app: ajustes do ciclo, histórico e aceite dos termos.
+/// Estado do app: ajustes do ciclo, histórico, lembretes e aceite dos termos.
 class AppController extends ChangeNotifier {
-  AppController(this._repository, {DateTime Function()? now})
-      : _now = now ?? DateTime.now,
+  AppController(
+    this._repository, {
+    DateTime Function()? now,
+    ReminderService? reminderService,
+    Locale Function()? deviceLocale,
+  })  : _now = now ?? DateTime.now,
+        _reminderService = reminderService ?? const NoReminderService(),
+        _deviceLocale = deviceLocale ?? (() => PlatformDispatcher.instance.locale),
         _settings = _repository.loadSettings(),
         _records = _repository.loadRecords(),
+        _reminders = _repository.loadReminderSettings(),
         _termsAccepted = _repository.loadTermsAcceptedAt() != null;
 
   final CycleRepository _repository;
   final DateTime Function() _now;
+  final ReminderService _reminderService;
+  final Locale Function() _deviceLocale;
 
   CycleSettings _settings;
   List<PeriodRecord> _records;
+  ReminderSettings _reminders;
   bool _termsAccepted;
+
+  /// Os lembretes estão ligados, mas o sistema não deixa o app mostrar notificações.
+  bool _remindersBlocked = false;
+
+  /// Já há avisos agendados nesta sessão (para só cancelar quando há o que cancelar).
+  bool _hasScheduledReminders = false;
+
+  /// As sincronizações correm uma depois da outra, para duas mudanças seguidas não se atropelarem.
+  Future<void> _syncChain = Future.value();
 
   CycleSettings get settings => _settings;
   bool get termsAccepted => _termsAccepted;
@@ -100,6 +125,7 @@ class AppController extends ChangeNotifier {
     }
 
     notifyListeners();
+    unawaited(syncReminders());
   }
 
   Future<void> setCycleStart(DateTime date) =>
@@ -124,6 +150,82 @@ class AppController extends ChangeNotifier {
     _settings = next;
     notifyListeners();
     await _repository.saveSettings(next);
+    unawaited(syncReminders());
+  }
+
+  ReminderSettings get reminders => _reminders;
+
+  /// Os lembretes estão ligados, mas o sistema bloqueia as notificações do app.
+  bool get remindersBlocked => _remindersBlocked;
+
+  /// Liga ou desliga os lembretes. Ao ligar o sistema pede permissão; se ela for negada os
+  /// lembretes continuam desligados e [remindersBlocked] avisa a tela.
+  Future<void> setRemindersEnabled(bool enabled) async {
+    if (!enabled) {
+      _remindersBlocked = false;
+      await _saveReminders(_reminders.copyWith(enabled: false));
+      return;
+    }
+    final granted = await _reminderService.requestPermission();
+    _remindersBlocked = !granted;
+    if (granted) {
+      await _saveReminders(_reminders.copyWith(enabled: true));
+    } else {
+      notifyListeners();
+    }
+  }
+
+  /// Muda horário, antecedência e quais avisos valem. Ligar e desligar tudo passa por
+  /// [setRemindersEnabled], que cuida da permissão.
+  Future<void> updateReminders(ReminderSettings next) =>
+      _saveReminders(next.copyWith(enabled: _reminders.enabled));
+
+  Future<void> _saveReminders(ReminderSettings next) async {
+    _reminders = next;
+    notifyListeners();
+    await _repository.saveReminderSettings(next);
+    await syncReminders();
+  }
+
+  /// Põe no sistema os avisos que o calendário prevê agora (ou tira todos, se os lembretes
+  /// estão desligados). Roda sempre que os dados mudam e quando o app abre.
+  Future<void> syncReminders() {
+    final run = _syncChain.then((_) => _syncRemindersNow()).catchError((Object error) {
+      debugPrint('Lembretes: $error');
+    });
+    _syncChain = run;
+    return run;
+  }
+
+  Future<void> _syncRemindersNow() async {
+    Future<void> cancelIfScheduled() async {
+      if (!_hasScheduledReminders) return;
+      await _reminderService.cancelAll();
+      _hasScheduledReminders = false;
+    }
+
+    if (!_reminders.enabled) return cancelIfScheduled();
+
+    if (!await _reminderService.isAllowed()) {
+      if (!_remindersBlocked) {
+        _remindersBlocked = true;
+        notifyListeners();
+      }
+      return cancelIfScheduled();
+    }
+    if (_remindersBlocked) {
+      _remindersBlocked = false;
+      notifyListeners();
+    }
+
+    final l10n = reminderLocalizations(_deviceLocale());
+    final plan = planReminders(calculator: calculator, settings: _reminders, now: _now());
+    await _reminderService.replaceAll(
+      [for (final reminder in plan) reminderText(l10n, reminder)],
+      channelName: l10n.reminderChannelName,
+      channelDescription: l10n.reminderChannelDescription,
+    );
+    _hasScheduledReminders = true;
   }
 
   /// Guarda as menstruações no histórico. Quem já existe (mesmo início) tem o
@@ -183,6 +285,7 @@ class AppController extends ChangeNotifier {
     _records = next;
     notifyListeners();
     await _repository.saveRecords(next);
+    unawaited(syncReminders());
   }
 }
 

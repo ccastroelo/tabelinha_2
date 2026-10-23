@@ -65,6 +65,25 @@ lib/
   - **Limite:** o histórico só reflete a realidade se a data de início for corrigida quando a
     menstruação vem em outro dia e o mês for registrado de novo. "Registrar menstruação do mês"
     grava as datas que o próprio app projetou; sem correção, a média sai igual à duração fixa.
+- **Lembretes.** Opcionais e desligados até a pessoa ligar (o sistema pede a permissão de
+  notificações nessa hora). Avisam a próxima menstruação (com 0 a 7 dias de antecedência), o
+  início do período fértil e a ovulação, num horário escolhido. São agendados no próprio
+  aparelho com `flutter_local_notifications`: nada passa por servidor nem por rede. O app agenda
+  os próximos 130 dias (no máximo ~15 avisos; o iOS aceita 64) e reagenda a cada mudança nos
+  dados e toda vez que abre; quem não abre o app por mais de uns 4 meses deixa de receber.
+  - **Código:** `lib/core/reminders.dart` (quais avisos e quando, puro e testado),
+    `lib/state/app_controller.dart` (liga/desliga, permissão e reagendamento),
+    `lib/data/local_notifications_service.dart` (o plugin) e `lib/ui/home/reminders_card.dart`.
+  - **Detalhes:** o texto não cita datas e diz que é só uma estimativa; no Android a
+    notificação fica oculta com a tela bloqueada e protegida. Cada aviso é um instante
+    absoluto (horário local do Dart convertido para UTC), então não há banco de fusos; ao viajar
+    para outro fuso os avisos já agendados seguem o horário de antes até o app abrir de novo.
+    Sem alarme exato, o aviso pode atrasar alguns minutos.
+  - **Android:** exige `coreLibraryDesugaring` no `build.gradle.kts` e os receptores do plugin
+    no `AndroidManifest.xml`; o ícone da barra de status é `res/drawable/ic_stat_tabelinha.xml`.
+    **iOS:** o `AppDelegate.swift` define o delegado das notificações. Não foi testado em
+    aparelho (sem Mac): vale conferir no TestFlight que o pedido de permissão aparece e que
+    os avisos chegam.
 - **Histórico.** Registrar o mesmo período duas vezes atualiza o registro em vez de duplicar
   (o original duplicava). A identidade do registro é a data de início. Registrar uma data a menos
   de 8 dias de um registro corrige esse registro (e mantém a anotação) em vez de criar outro,
@@ -73,7 +92,8 @@ lib/
   não aceita isso; aqui o botão "Continuar" só habilita depois de marcar "Estou ciente".
 - **Anotações.** Salvam sozinhas ao sair da tela (sem Cancelar/Gravar).
 - **Removidos:** Parse, Flurry, Facebook SDK, iRate e as notificações push. Nada disso
-  é necessário para o app funcionar.
+  é necessário para o app funcionar. (Os lembretes de hoje são outra coisa: notificações
+  locais, agendadas no próprio aparelho, sem servidor.)
 - pt-PT usava exatamente os mesmos textos do pt-BR, então `pt` cobre os dois.
 
 ## Visual
