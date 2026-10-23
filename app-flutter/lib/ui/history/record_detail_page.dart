@@ -53,7 +53,7 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
         appBar: AppBar(
           title: Text(l10n.notesTitle),
           actions: [
-            IconButton(
+            IconButton.filledTonal(
               tooltip: l10n.deleteRecord,
               icon: const Icon(Icons.delete_outline),
               onPressed: () {
@@ -74,6 +74,7 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                   );
               },
             ),
+            const SizedBox(width: 12),
           ],
         ),
         body: SafeArea(
@@ -81,21 +82,27 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 640),
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 children: [
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      monthTitle(context, record.start),
-                      style: text.headlineSmall,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Semantics(
+                          header: true,
+                          child: Text(monthTitle(context, record.start), style: text.headlineSmall),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${shortDate(context, record.start)} – ${shortDate(context, record.end)}'
+                          // Espaço não separável: "5 days" não quebra entre o número e a unidade.
+                          ' · ${l10n.daysCount(record.length).replaceAll(' ', ' ')}',
+                          style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${shortDate(context, record.start)} – ${shortDate(context, record.end)}'
-                    ' · ${l10n.daysCount(record.length)}',
-                    style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -104,7 +111,11 @@ class _RecordDetailPageState extends State<RecordDetailPage> {
                     maxLines: null,
                     textCapitalization: TextCapitalization.sentences,
                     keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(hintText: l10n.notesHint),
+                    style: text.bodyLarge,
+                    decoration: InputDecoration(
+                      hintText: l10n.notesHint,
+                      contentPadding: const EdgeInsets.all(20),
+                    ),
                   ),
                 ],
               ),

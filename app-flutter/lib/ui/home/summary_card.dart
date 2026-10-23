@@ -6,6 +6,8 @@ import '../../l10n/app_localizations.dart';
 import '../../state/app_controller.dart';
 import '../formatters.dart';
 import '../theme.dart';
+import '../widgets/hero_banner.dart';
+import '../widgets/soft_card.dart';
 import 'cycle_settings_card.dart';
 
 /// Topo da tela: pede o primeiro dia do ciclo ou mostra a situação de hoje.
@@ -30,33 +32,35 @@ class _Setup extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
 
-    return Card(
-      color: scheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.setupTitle,
-              style: text.titleLarge?.copyWith(color: scheme.onPrimaryContainer),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.setupBody,
-              style: text.bodyMedium?.copyWith(color: scheme.onPrimaryContainer),
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: () => pickCycleStart(context, controller),
-              icon: const Icon(Icons.event),
-              label: Text(l10n.setupAction),
-            ),
-          ],
+    // Só o título grande fica sobre o coral; o texto corrido vai no cartão branco.
+    return Column(
+      children: [
+        HeroBanner(title: l10n.setupTitle),
+        const SizedBox(height: 12),
+        SoftCard(
+          radius: 24,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.setupBody,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: () => pickCycleStart(context, controller),
+                icon: const Icon(Icons.event),
+                label: Text(l10n.setupAction),
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -69,122 +73,86 @@ class _TodaySummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
     final colors = CycleColors.of(context);
-    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
 
     final today = controller.today;
     final calculator = controller.calculator;
     final kind = calculator.kindOf(today);
-    final dayOfCycle = calculator.dayOfCycle(today)!;
-
-    final (Color background, Color foreground) = switch (kind) {
-      DayKind.menstruation => (colors.menstruation, colors.onMenstruation),
-      DayKind.fertile => (colors.fertile, colors.onFertile),
-      DayKind.ovulation => (colors.ovulation, colors.onOvulation),
-      DayKind.none => (scheme.surfaceContainerHigh, scheme.onSurface),
-    };
-    final (IconData icon, String? title) = switch (kind) {
-      DayKind.menstruation => (Icons.water_drop, l10n.menstruation),
-      DayKind.fertile => (Icons.local_florist, l10n.fertileWindow),
-      DayKind.ovulation => (Icons.egg_alt, l10n.ovulation),
-      DayKind.none => (Icons.calendar_today, null),
-    };
-
-    final cycleDay = l10n.dayOfCycle(dayOfCycle);
+    final cycleDay = l10n.dayOfCycle(calculator.dayOfCycle(today)!);
     final nextOvulation = calculator.nextOvulation(today)!;
     final nextPeriod = calculator.nextPeriodStart(today)!;
     final ovulationIn = nextOvulation.daysSince(today);
 
-    return Card(
-      color: background,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                ExcludeSemantics(child: Icon(icon, color: foreground, size: 32)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: MergeSemantics(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title ?? cycleDay,
-                          style: text.titleLarge?.copyWith(
-                            color: foreground,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (title != null)
-                          Text(
-                            cycleDay,
-                            style: text.bodyMedium?.copyWith(color: foreground),
-                          ),
-                      ],
-                    ),
-                  ),
+    final title = switch (kind) {
+      DayKind.menstruation => l10n.menstruation,
+      DayKind.fertile => l10n.fertileWindow,
+      DayKind.ovulation => l10n.ovulation,
+      DayKind.none => null,
+    };
+
+    return Column(
+      children: [
+        HeroBanner(title: title ?? cycleDay, subtitle: title == null ? null : cycleDay),
+        const SizedBox(height: 12),
+        SoftCard(
+          radius: 24,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: Column(
+            children: [
+              if (ovulationIn > 0) ...[
+                _UpcomingRow(
+                  color: colors.ovulation,
+                  label: l10n.ovulation,
+                  value: '${l10n.inDays(ovulationIn)} · ${dayAndMonth(context, nextOvulation)}',
                 ),
+                Divider(height: 1, thickness: 1, color: scheme.surface),
               ],
-            ),
-            const SizedBox(height: 16),
-            if (ovulationIn > 0)
               _UpcomingRow(
-                label: l10n.ovulation,
-                when: l10n.inDays(ovulationIn),
-                date: dayAndMonth(context, nextOvulation),
-                color: foreground,
+                color: colors.menstruation,
+                label: l10n.nextPeriod,
+                value:
+                    '${l10n.inDays(nextPeriod.daysSince(today))} · ${dayAndMonth(context, nextPeriod)}',
               ),
-            _UpcomingRow(
-              label: l10n.nextPeriod,
-              when: l10n.inDays(nextPeriod.daysSince(today)),
-              date: dayAndMonth(context, nextPeriod),
-              color: foreground,
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
 
 class _UpcomingRow extends StatelessWidget {
-  const _UpcomingRow({
-    required this.label,
-    required this.when,
-    required this.date,
-    required this.color,
-  });
+  const _UpcomingRow({required this.color, required this.label, required this.value});
 
-  final String label;
-  final String when;
-  final String date;
   final Color color;
+  final String label;
+  final String value;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+
     return MergeSemantics(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Text(label, style: text.bodyMedium?.copyWith(color: color)),
+            ExcludeSemantics(
+              child: DecoratedBox(
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                child: const SizedBox(width: 40, height: 40),
+              ),
             ),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Text(
-                '$when · $date',
-                textAlign: TextAlign.end,
-                style: text.bodyMedium?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.w700,
-                ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                  Text(value, style: text.titleSmall),
+                ],
               ),
             ),
           ],

@@ -29,7 +29,8 @@ lib/
   data/    PeriodRecord + CycleRepository (shared_preferences)
   state/   AppController (ChangeNotifier) + AppScope (InheritedNotifier)
   l10n/    ARBs
-  ui/      theme, home (resumo, calendário, ajustes), history, help, terms
+  ui/      theme, widgets (SoftCard, HeroBanner), home (resumo, calendário, ajustes),
+           history, help, terms
 ```
 
 ## O que veio do app original
@@ -60,6 +61,26 @@ lib/
 - **Removidos:** Parse, Flurry, Facebook SDK, iRate e as notificações push. Nada disso
   é necessário para o app funcionar.
 - pt-PT usava exatamente os mesmos textos do pt-BR, então `pt` cobre os dois.
+
+## Visual
+
+A direção visual é a "Acolhedor": fundo pêssego, cartões brancos de cantos bem
+arredondados com sombra suave, destaque coral em degradê no topo e a fonte Nunito.
+Mantém o coral do ícone. Vale para todas as telas, no tema claro e no escuro.
+
+- **Tema.** `lib/ui/theme.dart` define `buildTheme(Brightness)` e a extensão `CycleColors`
+  (menstruação, fértil, ovulação, tonal, destaque e sombra). As telas não usam cor fixa.
+- **Peças.** `SoftCard` e `HeroBanner` (`lib/ui/widgets/`) são a base de qualquer tela nova.
+- **Fonte.** Nunito (SIL OFL) vai embutida em `assets/fonts/`, sem baixar nada em execução.
+  A licença aparece na tela de licenças do app.
+- **Calendário.** Cada dia tem a própria forma: menstruação em quadrado cheio, período
+  fértil em quadrado tintado com um ponto sob o número, ovulação em círculo âmbar e "hoje"
+  com anel. O período fértil não depende só da cor.
+- **Contraste.** `test/contrast_test.dart` confere todos os pares texto/fundo nos dois
+  temas (4,5:1 para texto normal, 3:1 para texto grande). O branco sobre o coral só passa
+  de 3:1, por isso o `HeroBanner` leva apenas texto grande.
+- **Fonte ampliada.** `test/app_test.dart` percorre as telas em 360×640 dp com fonte a 2,0×
+  e falha se algo estourar.
 
 ## Importação dos dados do app antigo (iOS)
 

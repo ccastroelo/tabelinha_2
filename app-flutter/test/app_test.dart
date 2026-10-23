@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tabelinha/app.dart';
@@ -21,11 +22,20 @@ Map<String, Object> _configured() => {
       'periodLength': 5,
     };
 
-/// Viewport de celular (390×844 dp); o padrão de teste é 800×600.
-Future<void> _pump(WidgetTester tester, AppController controller) async {
-  tester.view.physicalSize = const Size(1170, 2532);
+/// Viewport de celular (390×844 dp por padrão); o padrão de teste é 800×600.
+Future<void> _pump(
+  WidgetTester tester,
+  AppController controller, {
+  Size size = const Size(390, 844),
+  double textScale = 1,
+}) async {
+  tester.view.physicalSize = size * 3;
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
+  if (textScale != 1) {
+    tester.platformDispatcher.textScaleFactorTestValue = textScale;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+  }
   await tester.pumpWidget(TabelinhaApp(controller: controller));
   await tester.pumpAndSettle();
 }
@@ -164,6 +174,76 @@ void main() {
       await tester.pumpAndSettle();
       expect(controller.records, hasLength(1));
       expect(controller.records.single.note, 'dor leve');
+    });
+  });
+
+  // Pior caso comum: celular pequeno (360×640 dp) com a fonte do sistema a 2,0×.
+  // Um RenderFlex overflow vira exceção no teste, então basta percorrer as telas.
+  group('layout com fonte ampliada em tela estreita', () {
+    const narrow = Size(360, 640);
+
+    // Sem isto o teste usa a fonte Ahem (glifos quadrados, bem mais largos que a real).
+    setUpAll(() async {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      final nunito = FontLoader('Nunito');
+      for (final weight in ['Regular', 'SemiBold', 'Bold', 'ExtraBold']) {
+        nunito.addFont(rootBundle.load('assets/fonts/Nunito-$weight.ttf'));
+      }
+      await nunito.load();
+    });
+
+    testWidgets('termos', (tester) async {
+      await _pump(tester, await _controller(), size: narrow, textScale: 2);
+      expect(find.text('Attention'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('home configurada, do banner aos ajustes', (tester) async {
+      await _pump(tester, await _controller(_configured()), size: narrow, textScale: 2);
+      expect(find.text('Fertile period'), findsWidgets);
+
+      await tester.scrollUntilVisible(find.byTooltip('Increase: Period length'), 200);
+      await tester.drag(find.byType(ListView).first, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('contraceptive'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('home sem data de início', (tester) async {
+      await _pump(
+        tester,
+        await _controller({'termsAcceptedAt': '2026-01-01T10:00:00.000'}),
+        size: narrow,
+        textScale: 2,
+      );
+      expect(find.text('Enter date'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('histórico, anotação e ajuda', (tester) async {
+      final controller = await _controller(_configured());
+      await controller.registerPeriods(
+        [PeriodRange(DateTime.utc(2026, 10, 5), DateTime.utc(2026, 10, 9))],
+      );
+      await _pump(tester, controller, size: narrow, textScale: 2);
+
+      await tester.tap(find.byTooltip('Records'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.text('October 2026'));
+      await tester.pumpAndSettle();
+      expect(find.byType(TextField), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Help'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
     });
   });
 

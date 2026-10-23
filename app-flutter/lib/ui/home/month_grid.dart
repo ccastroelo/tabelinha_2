@@ -7,24 +7,8 @@ import '../../core/date_only.dart';
 import '../../l10n/app_localizations.dart';
 import '../theme.dart';
 
-/// Altura de cada semana. Cresce com a escala de texto para o número nunca
-/// ficar espremido dentro do círculo/faixa.
-double _rowHeight(BuildContext context) =>
-    math.max(48, MediaQuery.textScalerOf(context).scale(16) * 2.4);
-
-/// Faixa de fundo que cobre o dia: 0 = nenhuma, 1 = menstruação, 2 = fértil.
-int _band(DayKind kind) => switch (kind) {
-      DayKind.none => 0,
-      DayKind.menstruation => 1,
-      DayKind.fertile || DayKind.ovulation => 2,
-    };
-
-class _Cell {
-  const _Cell(this.day, this.kind, this.isToday);
-  final int day;
-  final DayKind kind;
-  final bool isToday;
-}
+const _rowGap = 4.0;
+const _cellSize = 44.0;
 
 class MonthGrid extends StatelessWidget {
   const MonthGrid({
@@ -45,87 +29,59 @@ class MonthGrid extends StatelessWidget {
     final lead = positiveMod(month.weekday % 7 - firstDayOfWeek, 7);
     final count = daysInMonth(month.year, month.month);
     final rows = ((lead + count) / 7).ceil();
+    final textScale = MediaQuery.textScalerOf(context).scale(16);
 
-    _Cell? cellAt(int index) {
-      final day = index - lead + 1;
-      if (day < 1 || day > count) return null;
-      final date = DateTime.utc(month.year, month.month, day);
-      return _Cell(day, calculator.kindOf(date), date.isSameDay(today));
-    }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Largura limitada pela coluna (telas estreitas); altura cresce com a fonte,
+        // para o número nunca ficar espremido.
+        final width = math.min(_cellSize, constraints.maxWidth / 7);
+        final height = math.max(width, textScale * 2.2);
 
-    return Column(
-      children: [
-        for (var r = 0; r < rows; r++)
-          _WeekRow(cells: [for (var c = 0; c < 7; c++) cellAt(r * 7 + c)]),
-      ],
-    );
-  }
-}
-
-class _WeekRow extends StatelessWidget {
-  const _WeekRow({required this.cells});
-
-  final List<_Cell?> cells;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = CycleColors.of(context);
-    final height = _rowHeight(context);
-
-    // Agrupa dias vizinhos da mesma faixa: cada grupo vira uma pílula só.
-    final groups = <List<_Cell?>>[];
-    for (final cell in cells) {
-      final band = cell == null ? 0 : _band(cell.kind);
-      if (groups.isNotEmpty) {
-        final last = groups.last.last;
-        if ((last == null ? 0 : _band(last.kind)) == band) {
-          groups.last.add(cell);
-          continue;
-        }
-      }
-      groups.add([cell]);
-    }
-
-    return Row(
-      children: [
-        for (final group in groups)
-          Expanded(
-            flex: group.length,
-            child: Stack(
-              children: [
-                if (group.first != null && _band(group.first!.kind) != 0)
-                  Positioned.fill(
-                    top: 6,
-                    bottom: 6,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colors.bandFor(group.first!.kind),
-                        borderRadius: BorderRadius.circular(height),
-                      ),
-                    ),
-                  ),
-                Row(
-                  children: [
-                    for (final cell in group)
-                      Expanded(
-                        child: cell == null
-                            ? SizedBox(height: height)
-                            : _DayCell(cell: cell, height: height),
-                      ),
-                  ],
-                ),
-              ],
+        Widget slot(int index) {
+          final day = index - lead + 1;
+          if (day < 1 || day > count) return SizedBox(height: height);
+          final date = DateTime.utc(month.year, month.month, day);
+          return Center(
+            child: _DayCell(
+              day: day,
+              kind: calculator.kindOf(date),
+              isToday: date.isSameDay(today),
+              width: width,
+              height: height,
             ),
-          ),
-      ],
+          );
+        }
+
+        return Column(
+          children: [
+            for (var r = 0; r < rows; r++)
+              Padding(
+                padding: EdgeInsets.only(bottom: r == rows - 1 ? 0 : _rowGap),
+                child: Row(
+                  children: [for (var c = 0; c < 7; c++) Expanded(child: slot(r * 7 + c))],
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
 
 class _DayCell extends StatelessWidget {
-  const _DayCell({required this.cell, required this.height});
+  const _DayCell({
+    required this.day,
+    required this.kind,
+    required this.isToday,
+    required this.width,
+    required this.height,
+  });
 
-  final _Cell cell;
+  final int day;
+  final DayKind kind;
+  final bool isToday;
+  final double width;
   final double height;
 
   @override
@@ -134,125 +90,166 @@ class _DayCell extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final colors = CycleColors.of(context);
 
-    final isOvulation = cell.kind == DayKind.ovulation;
-    final textColor = switch (cell.kind) {
-      DayKind.none => scheme.onSurface,
-      DayKind.ovulation => colors.onOvulation,
-      _ => colors.onBandFor(cell.kind),
+    final (Color? fill, Color foreground, FontWeight weight) = switch (kind) {
+      DayKind.none => (null, scheme.onSurface, FontWeight.w600),
+      DayKind.menstruation => (colors.menstruation, colors.onMenstruation, FontWeight.w800),
+      DayKind.fertile => (colors.fertile, colors.onFertile, FontWeight.w800),
+      DayKind.ovulation => (colors.ovulation, colors.onOvulation, FontWeight.w800),
     };
-    final status = switch (cell.kind) {
+    // O anel de "hoje" precisa contrastar com o preenchimento do próprio dia.
+    final ring = switch (kind) {
+      DayKind.menstruation => colors.onMenstruation,
+      DayKind.ovulation => colors.onOvulation,
+      _ => colors.menstruation,
+    };
+    // Ovulação é sempre um círculo; com fonte grande a célula fica mais alta que larga.
+    final isOvulation = kind == DayKind.ovulation;
+    final side = math.min(width, height);
+    final radius = BorderRadius.circular(isOvulation ? side / 2 : 14);
+
+    final status = switch (kind) {
       DayKind.none => null,
       DayKind.menstruation => l10n.menstruation,
       DayKind.fertile => l10n.fertileWindow,
       DayKind.ovulation => '${l10n.fertileWindow}, ${l10n.ovulation}',
     };
-    final label = [
-      '${cell.day}',
-      ?status,
-      if (cell.isToday) l10n.today,
-    ].join(', ');
+    final label = ['$day', ?status, if (isToday) l10n.today].join(', ');
+
+    final number = Text(
+      '$day',
+      maxLines: 1,
+      softWrap: false,
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            fontSize: 16,
+            height: 1.1,
+            color: foreground,
+            fontWeight: weight,
+          ),
+    );
 
     return Semantics(
       label: label,
       excludeSemantics: true,
       child: SizedBox(
+        width: width,
         height: height,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            if (isOvulation)
-              _Disc(diameter: height - 12, color: colors.ovulation),
-            if (cell.isToday)
-              _Disc(diameter: height - 8, ringColor: scheme.onSurface),
-            Text(
-              '${cell.day}',
-              maxLines: 1,
-              softWrap: false,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: textColor,
-                    fontWeight: cell.isToday || isOvulation
-                        ? FontWeight.w800
-                        : FontWeight.w500,
-                  ),
-            ),
-          ],
+        child: Center(
+          child: Container(
+            width: isOvulation ? side : width,
+            height: isOvulation ? side : height,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: fill, borderRadius: radius),
+            foregroundDecoration: isToday
+                ? BoxDecoration(borderRadius: radius, border: Border.all(color: ring, width: 2.5))
+                : null,
+            // Período fértil leva um ponto sob o número: não depende só do tom.
+            child: kind == DayKind.fertile
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      number,
+                      const SizedBox(height: 2),
+                      DecoratedBox(
+                        decoration: BoxDecoration(color: foreground, shape: BoxShape.circle),
+                        child: const SizedBox(width: 4, height: 4),
+                      ),
+                    ],
+                  )
+                : number,
+          ),
         ),
       ),
     );
   }
 }
 
-class _Disc extends StatelessWidget {
-  const _Disc({required this.diameter, this.color, this.ringColor});
-
-  final double diameter;
-  final Color? color;
-  final Color? ringColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: diameter,
-      height: diameter,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        border: ringColor == null ? null : Border.all(color: ringColor!, width: 2),
-      ),
-    );
-  }
-}
-
-/// Legenda: cada item repete a forma usada no calendário, não só a cor.
+/// Legenda em pílulas; cada item repete a forma usada no calendário, não só a cor.
 class CycleLegend extends StatelessWidget {
   const CycleLegend({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
     final colors = CycleColors.of(context);
 
-    Widget pill(Color color) => Container(
-          width: 24,
-          height: 14,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(7)),
+    // Mesmas formas do calendário: quadrado cheio, quadrado tintado com ponto, círculo e anel.
+    Widget swatch({Color? fill, Color? border, double borderWidth = 2, Color? dot, bool circle = false}) =>
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: fill,
+            shape: circle ? BoxShape.circle : BoxShape.rectangle,
+            borderRadius: circle ? null : BorderRadius.circular(5),
+            border: border == null ? null : Border.all(color: border, width: borderWidth),
+          ),
+          child: SizedBox(
+            width: 16,
+            height: 16,
+            child: dot == null
+                ? null
+                : Center(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+                      child: const SizedBox(width: 4, height: 4),
+                    ),
+                  ),
+          ),
         );
 
     return Wrap(
-      spacing: 16,
+      spacing: 8,
       runSpacing: 8,
       children: [
-        _LegendItem(swatch: pill(colors.menstruation), label: l10n.menstruation),
-        _LegendItem(swatch: pill(colors.fertile), label: l10n.fertileWindow),
-        _LegendItem(
-          swatch: _Disc(diameter: 16, color: colors.ovulation),
-          label: l10n.ovulation,
+        _LegendChip(swatch: swatch(fill: colors.menstruation), label: l10n.menstruation),
+        _LegendChip(
+          // Tom sozinho some sobre a pílula; o contorno suave e o ponto marcam o dia fértil.
+          swatch: swatch(
+            fill: colors.fertile,
+            border: colors.onFertile.withValues(alpha: 0.35),
+            borderWidth: 1,
+            dot: colors.onFertile,
+          ),
+          label: l10n.fertileWindow,
         ),
-        _LegendItem(
-          swatch: _Disc(diameter: 16, ringColor: scheme.onSurface),
-          label: l10n.today,
-        ),
+        _LegendChip(swatch: swatch(fill: colors.ovulation, circle: true), label: l10n.ovulation),
+        _LegendChip(swatch: swatch(border: colors.menstruation), label: l10n.today),
       ],
     );
   }
 }
 
-class _LegendItem extends StatelessWidget {
-  const _LegendItem({required this.swatch, required this.label});
+class _LegendChip extends StatelessWidget {
+  const _LegendChip({required this.swatch, required this.label});
 
   final Widget swatch;
   final String label;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        ExcludeSemantics(child: swatch),
-        const SizedBox(width: 8),
-        Flexible(child: Text(label, style: Theme.of(context).textTheme.labelMedium)),
-      ],
+    final scheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ExcludeSemantics(child: swatch),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                label,
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: scheme.onSurfaceVariant),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

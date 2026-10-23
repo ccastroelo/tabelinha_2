@@ -88,6 +88,21 @@ flutter:
   uses-material-design: true
   generate: true
 
+  # Nunito (SIL OFL), embutida para funcionar offline. Licença em assets/fonts/OFL.txt,
+  # registrada em lib/main.dart para aparecer na tela de licenças.
+  assets:
+    - assets/fonts/OFL.txt
+  fonts:
+    - family: Nunito
+      fonts:
+        - asset: assets/fonts/Nunito-Regular.ttf
+        - asset: assets/fonts/Nunito-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Nunito-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Nunito-ExtraBold.ttf
+          weight: 800
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

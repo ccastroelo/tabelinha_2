@@ -87,22 +87,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         title: Text(l10n.appTitle),
         actions: [
           Builder(
-            builder: (buttonContext) => IconButton(
+            builder: (buttonContext) => IconButton.filledTonal(
               tooltip: l10n.shareTooltip,
               onPressed: () => _share(buttonContext),
               icon: const Icon(Icons.ios_share),
             ),
           ),
-          IconButton(
+          const SizedBox(width: 6),
+          IconButton.filledTonal(
             tooltip: l10n.historyTitle,
             onPressed: () => _open(const HistoryPage()),
             icon: const Icon(Icons.history),
           ),
-          IconButton(
+          const SizedBox(width: 6),
+          IconButton.filledTonal(
             tooltip: l10n.helpTitle,
             onPressed: () => _open(const HelpPage()),
             icon: const Icon(Icons.help_outline),
           ),
+          const SizedBox(width: 12),
         ],
       ),
       body: SafeArea(
@@ -110,12 +113,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
               children: [
                 const SummaryCard(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 CalendarCard(captureKey: _captureKey),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 const CycleSettingsCard(),
                 const SizedBox(height: 16),
                 _EstimateNote(text: l10n.estimateNote),
@@ -137,14 +140,10 @@ class _EstimateNote extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ExcludeSemantics(
-            child: Icon(Icons.info_outline, size: 18, color: scheme.onSurfaceVariant),
-          ),
-          const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,

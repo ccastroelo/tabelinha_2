@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../../state/app_controller.dart';
 import '../formatters.dart';
 import '../history/history_page.dart';
+import '../widgets/soft_card.dart';
 import 'month_grid.dart';
 
 class CalendarCard extends StatefulWidget {
@@ -61,10 +62,10 @@ class _CalendarCardState extends State<CalendarCard> {
     final canRegister = calculator.isConfigured &&
         calculator.periodsStartingIn(month.year, month.month).isNotEmpty;
 
-    final cardColor = Theme.of(context).cardTheme.color ?? scheme.surfaceContainerLow;
+    final cardColor = Theme.of(context).cardTheme.color ?? scheme.surfaceContainerLowest;
 
-    return Card(
-      clipBehavior: Clip.antiAlias,
+    return SoftCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           RepaintBoundary(
@@ -72,7 +73,7 @@ class _CalendarCardState extends State<CalendarCard> {
             child: ColoredBox(
               color: cardColor,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 16),
+                padding: const EdgeInsets.fromLTRB(12, 16, 12, 20),
                 child: Column(
                   children: [
                     _MonthHeader(
@@ -81,7 +82,9 @@ class _CalendarCardState extends State<CalendarCard> {
                       onNext: () => _shift(1),
                       onToday: () => _goTo(controller.today),
                     ),
+                    const SizedBox(height: 10),
                     const _WeekdayHeader(),
+                    const SizedBox(height: 8),
                     // Arrastar para os lados também troca o mês.
                     GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -108,10 +111,10 @@ class _CalendarCardState extends State<CalendarCard> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: CycleLegend(),
+                      padding: EdgeInsets.symmetric(horizontal: 4),
+                      child: Align(alignment: Alignment.centerLeft, child: CycleLegend()),
                     ),
                   ],
                 ),
@@ -120,10 +123,10 @@ class _CalendarCardState extends State<CalendarCard> {
           ),
           if (canRegister)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
               child: SizedBox(
                 width: double.infinity,
-                child: FilledButton.tonalIcon(
+                child: FilledButton.icon(
                   onPressed: () => _register(controller, month),
                   icon: const Icon(Icons.bookmark_add_outlined),
                   label: Text(l10n.registerMonth),
@@ -154,7 +157,7 @@ class _MonthHeader extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Row(
       children: [
-        IconButton(
+        IconButton.filledTonal(
           tooltip: l10n.previousMonth,
           onPressed: onPrevious,
           icon: const Icon(Icons.chevron_left),
@@ -166,23 +169,20 @@ class _MonthHeader extends StatelessWidget {
               message: l10n.goToToday,
               child: InkWell(
                 onTap: onToday,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(fontWeight: FontWeight.w700),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 20),
                   ),
                 ),
               ),
             ),
           ),
         ),
-        IconButton(
+        IconButton.filledTonal(
           tooltip: l10n.nextMonth,
           onPressed: onNext,
           icon: const Icon(Icons.chevron_right),
@@ -199,6 +199,7 @@ class _WeekdayHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final material = MaterialLocalizations.of(context);
     final style = Theme.of(context).textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w700,
           color: Theme.of(context).colorScheme.onSurfaceVariant,
         );
 

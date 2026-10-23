@@ -5,6 +5,7 @@ import '../../l10n/app_localizations.dart';
 import '../../state/app_controller.dart';
 import '../formatters.dart';
 import '../theme.dart';
+import '../widgets/soft_card.dart';
 import 'record_detail_page.dart';
 
 class HistoryPage extends StatelessWidget {
@@ -24,11 +25,10 @@ class HistoryPage extends StatelessWidget {
             child: records.isEmpty
                 ? const _EmptyState()
                 : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
                     itemCount: records.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) =>
-                        _RecordTile(record: records[index]),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) => _RecordTile(record: records[index]),
                   ),
           ),
         ),
@@ -44,23 +44,33 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
+    final colors = CycleColors.of(context);
     final text = Theme.of(context).textTheme;
 
     // ListView para rolar em telas baixas ou com fonte grande.
     return ListView(
       padding: const EdgeInsets.all(32),
       children: [
-        const SizedBox(height: 48),
-        ExcludeSemantics(
-          child: Icon(Icons.history, size: 56, color: scheme.onSurfaceVariant),
+        const SizedBox(height: 40),
+        Center(
+          child: ExcludeSemantics(
+            child: DecoratedBox(
+              decoration: BoxDecoration(color: colors.tonal, shape: BoxShape.circle),
+              child: SizedBox(
+                width: 88,
+                height: 88,
+                child: Icon(Icons.history, size: 40, color: colors.onTonal),
+              ),
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Text(l10n.historyEmptyTitle, textAlign: TextAlign.center, style: text.titleMedium),
         const SizedBox(height: 8),
         Text(
           l10n.historyEmptyBody,
           textAlign: TextAlign.center,
-          style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+          style: text.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
         ),
       ],
     );
@@ -88,7 +98,7 @@ class _RecordTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
           color: scheme.errorContainer,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Icon(Icons.delete_outline, color: scheme.onErrorContainer),
       ),
@@ -107,8 +117,9 @@ class _RecordTile extends StatelessWidget {
             ),
           );
       },
-      child: Card(
-        clipBehavior: Clip.antiAlias,
+      child: SoftCard(
+        radius: 24,
+        padding: EdgeInsets.zero,
         child: InkWell(
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -121,17 +132,23 @@ class _RecordTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        monthTitle(context, record.start),
-                        style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                    Expanded(child: Text(monthTitle(context, record.start), style: text.titleMedium)),
+                    const SizedBox(width: 12),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: colors.tonal,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        child: Text(
+                          l10n.daysCount(record.length),
+                          style: text.labelLarge?.copyWith(fontSize: 14, color: colors.onTonal),
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Text(l10n.daysCount(record.length), style: text.titleSmall),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -143,12 +160,12 @@ class _RecordTile extends StatelessWidget {
                 // Barra proporcional à duração (máx. 9 dias); decorativa, o texto acima já diz.
                 ExcludeSemantics(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
                       value: (record.length / 9).clamp(0.0, 1.0),
                       minHeight: 8,
                       color: colors.menstruation,
-                      backgroundColor: scheme.surfaceContainerHighest,
+                      backgroundColor: colors.tonal,
                     ),
                   ),
                 ),
@@ -158,11 +175,7 @@ class _RecordTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ExcludeSemantics(
-                        child: Icon(
-                          Icons.notes,
-                          size: 18,
-                          color: scheme.onSurfaceVariant,
-                        ),
+                        child: Icon(Icons.notes, size: 18, color: scheme.onSurfaceVariant),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -170,7 +183,7 @@ class _RecordTile extends StatelessWidget {
                           record.note,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: text.bodyMedium,
+                          style: text.bodyLarge?.copyWith(height: 1.35),
                         ),
                       ),
                     ],
