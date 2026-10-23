@@ -77,6 +77,60 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+/// Rodapé do cartão. Sempre aparece, com seta, para deixar claro que o cartão abre as
+/// anotações: sem anotação convida a escrever; com anotação mostra o começo dela.
+class _NoteRow extends StatelessWidget {
+  const _NoteRow({required this.note});
+
+  final String note;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final colors = CycleColors.of(context);
+    final text = Theme.of(context).textTheme;
+    final hasNote = note.isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          ExcludeSemantics(
+            child: Icon(
+              hasNote ? Icons.notes : Icons.edit_note,
+              size: 22,
+              color: hasNote ? scheme.onSurfaceVariant : colors.onTonal,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: hasNote
+                ? Text(
+                    note,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: text.bodyLarge?.copyWith(height: 1.35),
+                  )
+                : Text(
+                    l10n.addNote,
+                    style: text.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colors.onTonal,
+                    ),
+                  ),
+          ),
+          const SizedBox(width: 8),
+          ExcludeSemantics(
+            child: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RecordTile extends StatelessWidget {
   const _RecordTile({required this.record});
 
@@ -126,71 +180,60 @@ class _RecordTile extends StatelessWidget {
               builder: (_) => RecordDetailPage(recordId: record.id),
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(child: Text(monthTitle(context, record.start), style: text.titleMedium)),
-                    const SizedBox(width: 12),
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: colors.tonal,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        child: Text(
-                          l10n.daysCount(record.length),
-                          style: text.labelLarge?.copyWith(fontSize: 14, color: colors.onTonal),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(monthTitle(context, record.start), style: text.titleMedium),
+                        ),
+                        const SizedBox(width: 12),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: colors.tonal,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            child: Text(
+                              l10n.daysCount(record.length),
+                              style: text.labelLarge?.copyWith(fontSize: 14, color: colors.onTonal),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${shortDate(context, record.start)} – ${shortDate(context, record.end)}',
+                      style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(height: 12),
+                    // Barra proporcional à duração (máx. 9 dias); decorativa, o texto acima já diz.
+                    ExcludeSemantics(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: LinearProgressIndicator(
+                          value: (record.length / 9).clamp(0.0, 1.0),
+                          minHeight: 8,
+                          color: colors.menstruation,
+                          backgroundColor: colors.tonal,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${shortDate(context, record.start)} – ${shortDate(context, record.end)}',
-                  style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
-                ),
-                const SizedBox(height: 12),
-                // Barra proporcional à duração (máx. 9 dias); decorativa, o texto acima já diz.
-                ExcludeSemantics(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: LinearProgressIndicator(
-                      value: (record.length / 9).clamp(0.0, 1.0),
-                      minHeight: 8,
-                      color: colors.menstruation,
-                      backgroundColor: colors.tonal,
-                    ),
-                  ),
-                ),
-                if (record.note.isNotEmpty) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ExcludeSemantics(
-                        child: Icon(Icons.notes, size: 18, color: scheme.onSurfaceVariant),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          record.note,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: text.bodyLarge?.copyWith(height: 1.35),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
+              ),
+              Divider(height: 1, thickness: 1, color: scheme.surface),
+              _NoteRow(note: record.note),
+            ],
           ),
         ),
       ),

@@ -322,6 +322,12 @@ abstract class AppLocalizations {
   /// **'Escreva aqui suas anotações…'**
   String get notesHint;
 
+  /// No description provided for @addNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Adicionar anotação'**
+  String get addNote;
+
   /// No description provided for @termsTitle.
   ///
   /// In pt, this message translates to:

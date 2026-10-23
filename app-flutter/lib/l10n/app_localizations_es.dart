@@ -146,6 +146,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get notesHint => 'Escribe aquí tus notas…';
 
   @override
+  String get addNote => 'Añadir una nota';
+
+  @override
   String get termsTitle => 'Atención';
 
   @override

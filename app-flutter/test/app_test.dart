@@ -146,6 +146,23 @@ void main() {
       expect(find.text('No records yet'), findsOneWidget);
     });
 
+    testWidgets('cartão sem anotação convida a escrever e abre as anotações', (tester) async {
+      final controller = await _controller(_configured());
+      await controller.registerPeriods(
+        [PeriodRange(DateTime.utc(2026, 10, 5), DateTime.utc(2026, 10, 9))],
+      );
+      await _pump(tester, controller);
+
+      await tester.tap(find.byTooltip('Records'));
+      await tester.pumpAndSettle();
+      expect(find.text('Add a note'), findsOneWidget);
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+
+      await tester.tap(find.text('Add a note'));
+      await tester.pumpAndSettle();
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
     testWidgets('anotação salva ao sair da tela e excluir pode ser desfeito',
         (tester) async {
       final controller = await _controller(_configured());
@@ -165,6 +182,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(controller.records.single.note, 'dor leve');
       expect(find.text('dor leve'), findsOneWidget);
+      // Com anotação, o rodapé mostra o texto no lugar do convite.
+      expect(find.text('Add a note'), findsNothing);
 
       await tester.drag(find.text('October 2026'), const Offset(-600, 0));
       await tester.pumpAndSettle();

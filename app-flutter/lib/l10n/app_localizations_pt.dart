@@ -146,6 +146,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notesHint => 'Escreva aqui suas anotações…';
 
   @override
+  String get addNote => 'Adicionar anotação';
+
+  @override
   String get termsTitle => 'Atenção';
 
   @override

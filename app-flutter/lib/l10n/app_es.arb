@@ -45,6 +45,7 @@
   "undo": "Deshacer",
   "deleteRecord": "Eliminar registro",
   "notesHint": "Escribe aquí tus notas…",
+  "addNote": "Añadir una nota",
 
   "termsTitle": "Atención",
   "termsBody": "El \"Calendario de Fertilidad\" no debe ser usado como un método anticonceptivo. El período de ovulación puede variar de mujer a mujer, además de que existen diversos factores que también alteran la duración del ciclo, tales como: ansiedad, estrés, enfermedades, entre otros.\n\nPor lo tanto, el método es recomendado para la mujer que quiere embarazarse, y no para aquella que pretende evitar el embarazo. Además de eso, su cálculo es solamente una estimación.",
