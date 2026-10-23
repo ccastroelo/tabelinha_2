@@ -126,6 +126,39 @@ adb shell pm clear br.eti.claudiocastro.tabelinha
 adb shell bmgr restore 1 br.eti.claudiocastro.tabelinha
 ```
 
+## Ícone e splash
+
+O ícone é o do app iOS antigo: coral, setas e grade de pontos com o dia destacado. A versão
+em alta resolução (2048 px, quadrado cheio) não está no histórico do Git do app antigo, onde
+o maior arquivo é de 180 px; veio do `tabelinha_3` (`assets/icons/icon2048.png`).
+
+- **Fonte:** `assets/icon/icon.png`, cópia do original. As camadas do Android e as imagens da
+  splash (`assets/icon/adaptive_*.png`, `assets/splash/*.png`) saem dele por
+  `tool/generate_brand_assets_test.dart`: o símbolo é extraído do próprio original, não redesenhado.
+- **Configuração:** seções `flutter_launcher_icons` e `flutter_native_splash` do `pubspec.yaml`.
+- **Android:** ícone adaptativo (fundo `#FF5A5A` e símbolo), ícone temático (Android 13+) e
+  splash do Android 12+ (fundo coral com o símbolo).
+- **iOS:** `AppIcon` completo, com o de 1024 px sem canal alfa (a App Store rejeita
+  transparência), e `LaunchScreen` com fundo coral e o símbolo.
+- **Splash:** só coral, igual no claro e no escuro. A do app antigo era a marca "iDeias MOB © 2013".
+
+Para regenerar tudo:
+
+```bash
+flutter test tool/generate_brand_assets_test.dart
+dart run flutter_launcher_icons
+dart run flutter_native_splash:create
+git checkout -- ios/Runner.xcodeproj/project.pbxproj ios/Runner/Info.plist
+```
+
+O último comando desfaz estragos das ferramentas (só rode se não tiver outras mudanças nesses
+dois arquivos): o `flutter_launcher_icons` troca o valor de
+`ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS` por um inválido no `project.pbxproj`,
+e o `flutter_native_splash` reformata o `Info.plist`.
+
+Validado no emulador Android (ícone adaptativo e splash). O lado iOS (catálogo de ícones, 
+`LaunchScreen.storyboard`) foi gerado e revisado, mas não rodado.
+
 ## CI/CD (Codemagic)
 
 O `codemagic.yaml` fica na **raiz do repositório** (`../codemagic.yaml`; o Codemagic só o
