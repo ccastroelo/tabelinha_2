@@ -25,6 +25,7 @@ class AppController extends ChangeNotifier {
         _settings = _repository.loadSettings(),
         _records = _repository.loadRecords(),
         _reminders = _repository.loadReminderSettings(),
+        _intercourse = _repository.loadIntercourseDates(),
         _termsAccepted = _repository.loadTermsAcceptedAt() != null;
 
   final CycleRepository _repository;
@@ -35,6 +36,7 @@ class AppController extends ChangeNotifier {
   CycleSettings _settings;
   List<PeriodRecord> _records;
   ReminderSettings _reminders;
+  Set<DateTime> _intercourse;
   bool _termsAccepted;
 
   /// Os lembretes estão ligados, mas o sistema não deixa o app mostrar notificações.
@@ -286,6 +288,23 @@ class AppController extends ChangeNotifier {
     final next = [..._records];
     next[index] = next[index].copyWith(note: trimmed);
     await _saveRecords(next);
+  }
+
+  /// Os dias marcados com relação sexual. Não entram em nenhum cálculo: servem para a
+  /// pessoa olhar o calendário e saber se a relação caiu na janela fértil.
+  Set<DateTime> get intercourseDates => Set.unmodifiable(_intercourse);
+
+  bool hasIntercourse(DateTime day) => _intercourse.contains(dateOnly(day));
+
+  /// Marca ou desmarca o dia. Não mexe nos lembretes nem na previsão: nada aqui muda o
+  /// calendário, então não há o que reagendar.
+  Future<void> toggleIntercourse(DateTime day) async {
+    final date = dateOnly(day);
+    final next = {..._intercourse};
+    if (!next.remove(date)) next.add(date);
+    _intercourse = next;
+    notifyListeners();
+    await _repository.saveIntercourseDates(next);
   }
 
   Future<void> _saveRecords(List<PeriodRecord> next) async {

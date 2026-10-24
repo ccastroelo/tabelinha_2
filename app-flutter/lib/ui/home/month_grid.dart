@@ -9,6 +9,7 @@ import '../theme.dart';
 
 const _rowGap = 4.0;
 const _cellSize = 44.0;
+const _tapTarget = 48.0;
 
 class MonthGrid extends StatelessWidget {
   const MonthGrid({
@@ -16,12 +17,21 @@ class MonthGrid extends StatelessWidget {
     required this.month,
     required this.calculator,
     required this.today,
+    this.intercourse = const {},
+    this.onDayTap,
   });
 
   /// Primeiro dia do mês exibido.
   final DateTime month;
   final CycleCalculator calculator;
   final DateTime today;
+
+  /// Dias marcados com relação sexual. Vem vazio quando a imagem de compartilhamento
+  /// está sendo gerada: dado íntimo não sai do aparelho numa foto.
+  final Set<DateTime> intercourse;
+
+  /// `null` deixa o calendário só de leitura (é o caso durante a captura da imagem).
+  final void Function(DateTime date)? onDayTap;
 
   @override
   Widget build(BuildContext context) {
@@ -36,20 +46,30 @@ class MonthGrid extends StatelessWidget {
         // Largura limitada pela coluna (telas estreitas); altura cresce com a fonte,
         // para o número nunca ficar espremido.
         final width = math.min(_cellSize, constraints.maxWidth / 7);
-        final height = math.max(width, textScale * 2.2);
+        // Com o dia tocável, a célula é um alvo de toque: nunca menos de 48 dp de altura.
+        final floor = onDayTap == null ? width : math.max(width, _tapTarget);
+        final height = math.max(floor, textScale * 2.2);
 
         Widget slot(int index) {
           final day = index - lead + 1;
           if (day < 1 || day > count) return SizedBox(height: height);
           final date = DateTime.utc(month.year, month.month, day);
-          return Center(
+          final cell = Center(
             child: _DayCell(
               day: day,
               kind: calculator.kindOf(date),
               isToday: date.isSameDay(today),
+              marked: intercourse.contains(date),
               width: width,
               height: height,
             ),
+          );
+          final onTap = onDayTap;
+          if (onTap == null) return cell;
+          return InkWell(
+            onTap: () => onTap(date),
+            borderRadius: BorderRadius.circular(14),
+            child: cell,
           );
         }
 
@@ -74,6 +94,7 @@ class _DayCell extends StatelessWidget {
     required this.day,
     required this.kind,
     required this.isToday,
+    required this.marked,
     required this.width,
     required this.height,
   });
@@ -81,6 +102,7 @@ class _DayCell extends StatelessWidget {
   final int day;
   final DayKind kind;
   final bool isToday;
+  final bool marked;
   final double width;
   final double height;
 
@@ -113,7 +135,8 @@ class _DayCell extends StatelessWidget {
       DayKind.fertile => l10n.fertileWindow,
       DayKind.ovulation => '${l10n.fertileWindow}, ${l10n.ovulation}',
     };
-    final label = ['$day', ?status, if (isToday) l10n.today].join(', ');
+    final label = ['$day', ?status, if (isToday) l10n.today, if (marked) l10n.intercourse]
+        .join(', ');
 
     final number = Text(
       '$day',
@@ -143,8 +166,11 @@ class _DayCell extends StatelessWidget {
                 ? BoxDecoration(borderRadius: radius, border: Border.all(color: ring, width: 2.5))
                 : null,
             // Período fértil leva um ponto sob o número: não depende só do tom.
-            child: kind == DayKind.fertile
-                ? Column(
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (kind == DayKind.fertile)
+                  Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       number,
@@ -155,7 +181,18 @@ class _DayCell extends StatelessWidget {
                       ),
                     ],
                   )
-                : number,
+                else
+                  number,
+                // O coração vai no canto para não disputar espaço com o número nem com o
+                // ponto do dia fértil.
+                if (marked)
+                  Positioned(
+                    top: 3,
+                    right: 3,
+                    child: Icon(Icons.favorite, size: 9, color: foreground),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -165,7 +202,10 @@ class _DayCell extends StatelessWidget {
 
 /// Legenda em pílulas; cada item repete a forma usada no calendário, não só a cor.
 class CycleLegend extends StatelessWidget {
-  const CycleLegend({super.key});
+  const CycleLegend({super.key, this.showIntercourse = true});
+
+  /// Fora na imagem de compartilhamento, onde a marca de relação também não aparece.
+  final bool showIntercourse;
 
   @override
   Widget build(BuildContext context) {
@@ -212,6 +252,15 @@ class CycleLegend extends StatelessWidget {
         ),
         _LegendChip(swatch: swatch(fill: colors.ovulation, circle: true), label: l10n.ovulation),
         _LegendChip(swatch: swatch(border: colors.menstruation), label: l10n.today),
+        if (showIntercourse)
+          _LegendChip(
+            swatch: SizedBox(
+              width: 16,
+              height: 16,
+              child: Icon(Icons.favorite, size: 12, color: colors.menstruation),
+            ),
+            label: l10n.intercourse,
+          ),
       ],
     );
   }

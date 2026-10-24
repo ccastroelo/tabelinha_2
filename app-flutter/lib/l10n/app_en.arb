@@ -16,6 +16,9 @@
   "menstruation": "Menstruation",
   "fertileWindow": "Fertile period",
   "ovulation": "Ovulation",
+  "intercourse": "Sex",
+  "intercourseHint": "Stays on your device only and never shows up in the image you share.",
+  "noPhaseDay": "Outside your period and fertile window",
 
   "yourCycle": "Your cycle",
   "cycleStart": "First day of cycle",

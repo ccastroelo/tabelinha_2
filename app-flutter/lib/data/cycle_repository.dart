@@ -29,6 +29,7 @@ class CycleRepository {
   static const _kReminderOvulation = 'reminderOvulation';
   static const _kTermsAcceptedAt = 'termsAcceptedAt';
   static const _kRecords = 'periodRecords';
+  static const _kIntercourse = 'intercourseDates';
   static const _kLegacyImported = 'legacyImported';
 
   static Future<CycleRepository> open() async =>
@@ -94,6 +95,20 @@ class CycleRepository {
       debugPrint('Histórico ilegível, ignorando: $e');
       return [];
     }
+  }
+
+  /// Os dias marcados com relação sexual, como datas de calendário. Ficam fora de
+  /// [PeriodRecord] de propósito: não são uma menstruação, não entram no cálculo do ciclo
+  /// e nenhum outro dado depende deles — guardar à parte deixa apagar só isso.
+  Set<DateTime> loadIntercourseDates() {
+    final raw = _prefs.getStringList(_kIntercourse);
+    if (raw == null) return {};
+    return raw.map(tryParseIsoDate).whereType<DateTime>().toSet();
+  }
+
+  Future<void> saveIntercourseDates(Set<DateTime> dates) {
+    final sorted = dates.map(toIsoDate).toList()..sort();
+    return _prefs.setStringList(_kIntercourse, sorted);
   }
 
   bool get legacyImported => _prefs.getBool(_kLegacyImported) ?? false;

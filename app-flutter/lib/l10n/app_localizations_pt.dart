@@ -48,6 +48,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get ovulation => 'Ovulação';
 
   @override
+  String get intercourse => 'Relação sexual';
+
+  @override
+  String get intercourseHint =>
+      'Fica só no seu aparelho e não aparece na imagem que você compartilha.';
+
+  @override
+  String get noPhaseDay => 'Fora da menstruação e do período fértil';
+
+  @override
   String get yourCycle => 'Seu ciclo';
 
   @override

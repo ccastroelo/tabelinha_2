@@ -14,6 +14,10 @@ String monthTitle(BuildContext context, DateTime date) =>
 String shortDate(BuildContext context, DateTime date) =>
     DateFormat.yMd(_locale(context)).format(date);
 
+/// "quarta-feira, 21 de outubro de 2026"
+String fullDate(BuildContext context, DateTime date) =>
+    _capitalize(DateFormat.yMMMMEEEEd(_locale(context)).format(date));
+
 /// "5 de out."
 String dayAndMonth(BuildContext context, DateTime date) =>
     DateFormat.MMMd(_locale(context)).format(date);

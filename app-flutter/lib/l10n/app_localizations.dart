@@ -178,6 +178,24 @@ abstract class AppLocalizations {
   /// **'Ovulação'**
   String get ovulation;
 
+  /// No description provided for @intercourse.
+  ///
+  /// In pt, this message translates to:
+  /// **'Relação sexual'**
+  String get intercourse;
+
+  /// No description provided for @intercourseHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fica só no seu aparelho e não aparece na imagem que você compartilha.'**
+  String get intercourseHint;
+
+  /// No description provided for @noPhaseDay.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fora da menstruação e do período fértil'**
+  String get noPhaseDay;
+
   /// No description provided for @yourCycle.
   ///
   /// In pt, this message translates to:

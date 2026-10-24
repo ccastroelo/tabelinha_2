@@ -6,13 +6,18 @@ import '../../state/app_controller.dart';
 import '../formatters.dart';
 import '../history/history_page.dart';
 import '../widgets/soft_card.dart';
+import 'day_sheet.dart';
 import 'month_grid.dart';
 
 class CalendarCard extends StatefulWidget {
-  const CalendarCard({super.key, required this.captureKey});
+  const CalendarCard({super.key, required this.captureKey, this.capturing = false});
 
   /// Marca a área que vai para a imagem de compartilhamento.
   final GlobalKey captureKey;
+
+  /// A imagem de compartilhamento está sendo gerada agora: o calendário sai só de leitura e
+  /// sem as marcas de relação sexual.
+  final bool capturing;
 
   @override
   State<CalendarCard> createState() => _CalendarCardState();
@@ -107,14 +112,22 @@ class _CalendarCardState extends State<CalendarCard> {
                             month: month,
                             calculator: calculator,
                             today: controller.today,
+                            intercourse:
+                                widget.capturing ? const {} : controller.intercourseDates,
+                            onDayTap: widget.capturing
+                                ? null
+                                : (date) => showDaySheet(context, date),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4),
-                      child: Align(alignment: Alignment.centerLeft, child: CycleLegend()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: CycleLegend(showIntercourse: !widget.capturing),
+                      ),
                     ),
                   ],
                 ),

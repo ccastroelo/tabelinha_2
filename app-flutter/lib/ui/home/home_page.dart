@@ -25,6 +25,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _captureKey = GlobalKey();
 
+  /// Enquanto é `true`, o calendário se desenha sem as marcas de relação sexual, que é o
+  /// quadro que vai para a imagem.
+  bool _capturing = false;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +59,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     final origin = box == null ? null : box.localToGlobal(Offset.zero) & box.size;
 
     try {
+      // Tira as marcas de relação sexual do quadro e espera o desenho acontecer: a captura
+      // pega o que está na tela, então sem este passo o dado íntimo iria na imagem.
+      setState(() => _capturing = true);
+      await WidgetsBinding.instance.endOfFrame;
+      if (!mounted) return;
+
       final boundary =
           _captureKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) return;
@@ -76,6 +86,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     } catch (e, stack) {
       debugPrint('Erro ao compartilhar: $e\n$stack');
       messenger.showSnackBar(SnackBar(content: Text(l10n.shareError)));
+    } finally {
+      if (mounted) setState(() => _capturing = false);
     }
   }
 
@@ -129,7 +141,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               children: [
                 const SummaryCard(),
                 const SizedBox(height: 12),
-                CalendarCard(captureKey: _captureKey),
+                CalendarCard(captureKey: _captureKey, capturing: _capturing),
                 const SizedBox(height: 12),
                 const CycleSettingsCard(),
                 const SizedBox(height: 12),

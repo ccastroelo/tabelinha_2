@@ -109,6 +109,20 @@ lib/
     biométrico quebra no Android 8 ou anterior). **iOS:** `NSFaceIDUsageDescription` no
     `Info.plist`, em inglês (traduzir exige `InfoPlist.strings` no projeto Xcode). Não foi
     testado em aparelho iOS (sem Mac): vale conferir Face ID e Touch ID no TestFlight.
+- **Relação sexual.** Opcional, e desligada de fato até a pessoa marcar: tocar um dia do
+  calendário abre uma folha com a fase daquele dia e o interruptor "Relação sexual". É uma folha,
+  e não um toque que marca direto, porque é o dado mais íntimo que o app guarda — um toque solto
+  no calendário não pode gravar isso. Fica à parte dos registros de menstruação
+  (`intercourseDates`, uma lista de datas), não entra em nenhum cálculo e não reagenda lembrete
+  nenhum.
+  - **Nunca sai na imagem.** O botão "Compartilhar calendário" gera um PNG do mês; ao capturar,
+    o calendário é redesenhado sem as marcas e sem o item da legenda (`capturing` em
+    `CalendarCard`, que espera um quadro antes de capturar). Sem isso a pessoa vazaria isso num
+    grupo sem perceber.
+  - **Código:** `toggleIntercourse` e `hasIntercourse` (`lib/state/app_controller.dart`),
+    `lib/ui/home/day_sheet.dart`, a marca (coração no canto) e a legenda em
+    `lib/ui/home/month_grid.dart`, e `test/intercourse_test.dart`. A política de privacidade
+    (`store/privacy-policy.html`) lista esse dado nos três idiomas.
 - **Histórico.** Registrar o mesmo período duas vezes atualiza o registro em vez de duplicar
   (o original duplicava). A identidade do registro é a data de início. Registrar uma data a menos
   de 8 dias de um registro corrige esse registro (e mantém a anotação) em vez de criar outro,
@@ -134,7 +148,8 @@ Mantém o coral do ícone. Vale para todas as telas, no tema claro e no escuro.
   A licença aparece na tela de licenças do app.
 - **Calendário.** Cada dia tem a própria forma: menstruação em quadrado cheio, período
   fértil em quadrado tintado com um ponto sob o número, ovulação em círculo âmbar e "hoje"
-  com anel. O período fértil não depende só da cor.
+  com anel; o dia com relação sexual marcada leva um coração no canto. O período fértil não
+  depende só da cor.
 - **Contraste.** `test/contrast_test.dart` confere todos os pares texto/fundo nos dois
   temas (4,5:1 para texto normal, 3:1 para texto grande). O branco sobre o coral só passa
   de 3:1, por isso o `HeroBanner` leva apenas texto grande.

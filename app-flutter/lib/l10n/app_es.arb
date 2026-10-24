@@ -16,6 +16,9 @@
   "menstruation": "Menstruación",
   "fertileWindow": "Período fértil",
   "ovulation": "Ovulación",
+  "intercourse": "Relación sexual",
+  "intercourseHint": "Se queda solo en tu dispositivo y no aparece en la imagen que compartes.",
+  "noPhaseDay": "Fuera de la menstruación y del período fértil",
 
   "yourCycle": "Tu ciclo",
   "cycleStart": "Inicio del ciclo",
