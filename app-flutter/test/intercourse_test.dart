@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tabelinha/app.dart';
 import 'package:tabelinha/data/cycle_repository.dart';
+import 'package:tabelinha/data/intercourse.dart';
 import 'package:tabelinha/l10n/app_localizations.dart';
 import 'package:tabelinha/state/app_controller.dart';
 import 'package:tabelinha/ui/home/calendar_card.dart';
@@ -94,6 +95,59 @@ void main() {
       expect(reaberto.hasIntercourse(DateTime.utc(2026, 10, 20)), isTrue);
     });
 
+    test('o dia marcado começa sem dizer nada sobre contraceptivo', () async {
+      final controller = await _controller();
+      final day = DateTime.utc(2026, 10, 20);
+      await controller.toggleIntercourse(day);
+
+      expect(controller.contraceptionOn(day), Contraception.naoInformado);
+    });
+
+    test('com e sem contraceptivo sobrevivem a reiniciar o app', () async {
+      final controller = await _controller(_configured());
+      await controller.toggleIntercourse(DateTime.utc(2026, 10, 19));
+      await controller.toggleIntercourse(DateTime.utc(2026, 10, 20));
+      await controller.setContraception(DateTime.utc(2026, 10, 19), Contraception.com);
+      await controller.setContraception(DateTime.utc(2026, 10, 20), Contraception.sem);
+
+      final reaberto = AppController(await CycleRepository.open(), now: () => _now);
+      expect(reaberto.contraceptionOn(DateTime.utc(2026, 10, 19)), Contraception.com);
+      expect(reaberto.contraceptionOn(DateTime.utc(2026, 10, 20)), Contraception.sem);
+    });
+
+    test('desmarcar o dia esquece o contraceptivo', () async {
+      final controller = await _controller();
+      final day = DateTime.utc(2026, 10, 20);
+      await controller.toggleIntercourse(day);
+      await controller.setContraception(day, Contraception.sem);
+
+      await controller.toggleIntercourse(day);
+      await controller.toggleIntercourse(day);
+
+      expect(controller.contraceptionOn(day), Contraception.naoInformado);
+    });
+
+    test('informar contraceptivo não marca o dia sozinho', () async {
+      final controller = await _controller();
+      final day = DateTime.utc(2026, 10, 20);
+
+      await controller.setContraception(day, Contraception.com);
+
+      expect(controller.hasIntercourse(day), isFalse);
+      expect(controller.contraceptionOn(day), Contraception.naoInformado);
+    });
+
+    test('os dias guardados pela primeira versão entram como não informado', () async {
+      SharedPreferences.setMockInitialValues({
+        ..._configured(),
+        'intercourseDates': <String>['2026-10-20'],
+      });
+      final controller = AppController(await CycleRepository.open(), now: () => _now);
+
+      expect(controller.hasIntercourse(DateTime.utc(2026, 10, 20)), isTrue);
+      expect(controller.contraceptionOn(DateTime.utc(2026, 10, 20)), Contraception.naoInformado);
+    });
+
     test('a lista guardada é ilegível sem quebrar o app', () async {
       SharedPreferences.setMockInitialValues({
         ..._configured(),
@@ -157,6 +211,35 @@ void main() {
       await tester.tapAt(const Offset(200, 60));
       await tester.pumpAndSettle();
       expect(_hearts, findsOneWidget);
+    });
+
+    testWidgets('a folha informa contraceptivo e volta atrás', (tester) async {
+      final controller = await _controller(_configured());
+      await _pump(tester, controller);
+      final day = DateTime.utc(2026, 10, 20);
+
+      await tester.tap(_day(20));
+      await tester.pumpAndSettle();
+      expect(find.byType(SegmentedButton<Contraception>), findsNothing,
+          reason: 'sem o dia marcado não há o que informar');
+
+      await tester.tap(find.byType(SwitchListTile));
+      await tester.pumpAndSettle();
+      expect(find.byType(SegmentedButton<Contraception>), findsOneWidget);
+
+      await tester.tap(find.text('Sem'));
+      await tester.pumpAndSettle();
+      expect(controller.contraceptionOn(day), Contraception.sem);
+
+      await tester.tap(find.text('Com'));
+      await tester.pumpAndSettle();
+      expect(controller.contraceptionOn(day), Contraception.com);
+
+      // Tocar o que já está marcado volta para "não informado".
+      await tester.tap(find.text('Com'));
+      await tester.pumpAndSettle();
+      expect(controller.contraceptionOn(day), Contraception.naoInformado);
+      expect(controller.hasIntercourse(day), isTrue, reason: 'o dia segue marcado');
     });
 
     testWidgets('o dia marcado se anuncia para o leitor de tela', (tester) async {

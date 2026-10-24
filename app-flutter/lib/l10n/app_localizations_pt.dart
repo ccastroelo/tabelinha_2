@@ -55,6 +55,25 @@ class AppLocalizationsPt extends AppLocalizations {
       'Fica só no seu aparelho e não aparece na imagem que você compartilha.';
 
   @override
+  String get contraception => 'Contraceptivo';
+
+  @override
+  String get contraceptionWith => 'Com';
+
+  @override
+  String get contraceptionWithout => 'Sem';
+
+  @override
+  String get contraceptionWithLabel => 'Com contraceptivo';
+
+  @override
+  String get contraceptionWithoutLabel => 'Sem contraceptivo';
+
+  @override
+  String get contraceptionHint =>
+      'Opcional: deixe os dois sem marcar se não quiser informar.';
+
+  @override
   String get noPhaseDay => 'Fora da menstruação e do período fértil';
 
   @override

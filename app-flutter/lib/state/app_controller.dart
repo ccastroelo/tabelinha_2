@@ -7,6 +7,7 @@ import '../core/cycle_calculator.dart';
 import '../core/date_only.dart';
 import '../core/reminders.dart';
 import '../data/cycle_repository.dart';
+import '../data/intercourse.dart';
 import '../data/legacy_data.dart';
 import '../data/period_record.dart';
 import '../data/reminder_service.dart';
@@ -25,7 +26,7 @@ class AppController extends ChangeNotifier {
         _settings = _repository.loadSettings(),
         _records = _repository.loadRecords(),
         _reminders = _repository.loadReminderSettings(),
-        _intercourse = _repository.loadIntercourseDates(),
+        _intercourse = _repository.loadIntercourse(),
         _termsAccepted = _repository.loadTermsAcceptedAt() != null;
 
   final CycleRepository _repository;
@@ -36,7 +37,7 @@ class AppController extends ChangeNotifier {
   CycleSettings _settings;
   List<PeriodRecord> _records;
   ReminderSettings _reminders;
-  Set<DateTime> _intercourse;
+  Map<DateTime, Contraception> _intercourse;
   bool _termsAccepted;
 
   /// Os lembretes estão ligados, mas o sistema não deixa o app mostrar notificações.
@@ -290,21 +291,42 @@ class AppController extends ChangeNotifier {
     await _saveRecords(next);
   }
 
-  /// Os dias marcados com relação sexual. Não entram em nenhum cálculo: servem para a
-  /// pessoa olhar o calendário e saber se a relação caiu na janela fértil.
-  Set<DateTime> get intercourseDates => Set.unmodifiable(_intercourse);
+  /// Os dias marcados com relação sexual, cada um com o que a pessoa informou sobre
+  /// contraceptivo. Não entram em nenhum cálculo: servem para a pessoa olhar o calendário e
+  /// saber se a relação caiu na janela fértil.
+  Map<DateTime, Contraception> get intercourse => Map.unmodifiable(_intercourse);
 
-  bool hasIntercourse(DateTime day) => _intercourse.contains(dateOnly(day));
+  Set<DateTime> get intercourseDates => Set.unmodifiable(_intercourse.keys);
 
-  /// Marca ou desmarca o dia. Não mexe nos lembretes nem na previsão: nada aqui muda o
-  /// calendário, então não há o que reagendar.
+  bool hasIntercourse(DateTime day) => _intercourse.containsKey(dateOnly(day));
+
+  /// [Contraception.naoInformado] tanto para o dia sem marca quanto para o dia marcado em que
+  /// a pessoa não quis dizer: o app não supõe nada a partir do silêncio.
+  Contraception contraceptionOn(DateTime day) =>
+      _intercourse[dateOnly(day)] ?? Contraception.naoInformado;
+
+  /// Marca ou desmarca o dia. Desmarcar esquece junto o que foi informado sobre contraceptivo.
+  /// Não mexe nos lembretes nem na previsão: nada aqui muda o calendário, então não há o que
+  /// reagendar.
   Future<void> toggleIntercourse(DateTime day) async {
     final date = dateOnly(day);
     final next = {..._intercourse};
-    if (!next.remove(date)) next.add(date);
+    if (next.remove(date) == null) next[date] = Contraception.naoInformado;
+    await _saveIntercourse(next);
+  }
+
+  /// Só vale para dia já marcado: informar contraceptivo não marca o dia sozinho.
+  Future<void> setContraception(DateTime day, Contraception value) async {
+    final date = dateOnly(day);
+    if (!_intercourse.containsKey(date)) return;
+    if (_intercourse[date] == value) return;
+    await _saveIntercourse({..._intercourse, date: value});
+  }
+
+  Future<void> _saveIntercourse(Map<DateTime, Contraception> next) async {
     _intercourse = next;
     notifyListeners();
-    await _repository.saveIntercourseDates(next);
+    await _repository.saveIntercourse(next);
   }
 
   Future<void> _saveRecords(List<PeriodRecord> next) async {

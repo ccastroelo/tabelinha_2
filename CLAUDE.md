@@ -63,8 +63,9 @@ Testar no emulador exige um PIN (`adb shell locksettings set-pin 1234`; depois
 ## Relação sexual
 
 Opcional, marcada dia a dia pela folha que abre ao tocar o dia no calendário
-(`lib/ui/home/day_sheet.dart`); guardada à parte dos registros, em `intercourseDates`, e fora de
-qualquer cálculo. Duas regras que não se quebram: **a marca nunca entra na imagem do
+(`lib/ui/home/day_sheet.dart`); guardada à parte dos registros, em `intercourseLog` (data →
+contraceptivo informado), e fora de qualquer cálculo. O contraceptivo é opcional e tem três
+estados, sendo "não informado" o inicial; o app **não calcula risco de gravidez** a partir dele. Duas regras que não se quebram: **a marca nunca entra na imagem do
 "Compartilhar calendário"** (o `capturing` do `CalendarCard` redesenha o mês sem as marcas e sem o
 item da legenda antes da captura — `test/intercourse_test.dart` confere) e, como é dado de saúde,
 qualquer dado novo que o app passe a guardar entra na lista da `store/privacy-policy.html` nos três

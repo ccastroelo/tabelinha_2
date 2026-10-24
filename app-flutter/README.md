@@ -113,8 +113,13 @@ lib/
   calendário abre uma folha com a fase daquele dia e o interruptor "Relação sexual". É uma folha,
   e não um toque que marca direto, porque é o dado mais íntimo que o app guarda — um toque solto
   no calendário não pode gravar isso. Fica à parte dos registros de menstruação
-  (`intercourseDates`, uma lista de datas), não entra em nenhum cálculo e não reagenda lembrete
-  nenhum.
+  (`intercourseLog`, um mapa de data para contraceptivo), não entra em nenhum cálculo e não
+  reagenda lembrete nenhum.
+  - **Com ou sem contraceptivo.** Depois de marcar o dia, a folha mostra "Com" e "Sem"; nenhum
+    dos dois marcado é "não informado", que também é o estado inicial — o app não supõe nada a
+    partir do silêncio e **não calcula risco de gravidez** com isso: é registro, não conselho.
+    Desmarcar o dia esquece junto o que foi informado. A primeira versão guardava só as datas
+    (`intercourseDates`); elas são lidas como "não informado".
   - **Nunca sai na imagem.** O botão "Compartilhar calendário" gera um PNG do mês; ao capturar,
     o calendário é redesenhado sem as marcas e sem o item da legenda (`capturing` em
     `CalendarCard`, que espera um quadro antes de capturar). Sem isso a pessoa vazaria isso num

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/cycle_calculator.dart';
+import '../../data/intercourse.dart';
 import '../../l10n/app_localizations.dart';
 import '../../state/app_controller.dart';
 import '../formatters.dart';
@@ -25,6 +26,7 @@ class _DaySheet extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final controller = AppScope.of(context);
     final theme = Theme.of(context);
+    final marked = controller.hasIntercourse(date);
 
     final phase = switch (controller.calculator.kindOf(date)) {
       DayKind.none => l10n.noPhaseDay,
@@ -53,13 +55,74 @@ class _DaySheet extends StatelessWidget {
             const SizedBox(height: 8),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
-              value: controller.hasIntercourse(date),
+              value: marked,
               onChanged: (_) => controller.toggleIntercourse(date),
               title: Text(l10n.intercourse),
               subtitle: Text(l10n.intercourseHint),
             ),
+            // Só depois de marcar o dia: informar contraceptivo não marca o dia sozinho.
+            if (marked) _Contraception(date: date),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+/// "Com" ou "Sem", e nenhum dos dois quando a pessoa não quis informar. O app não lê risco
+/// nenhum disso: é registro, não conselho.
+class _Contraception extends StatelessWidget {
+  const _Contraception({required this.date});
+
+  final DateTime date;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final controller = AppScope.of(context);
+    final theme = Theme.of(context);
+    final current = controller.contraceptionOn(date);
+
+    ButtonSegment<Contraception> segment(Contraception value, String short, String full) =>
+        ButtonSegment(
+          value: value,
+          tooltip: full,
+          label: Semantics(label: full, child: ExcludeSemantics(child: Text(short))),
+        );
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.contraception, style: theme.textTheme.titleSmall),
+          const SizedBox(height: 8),
+          SegmentedButton<Contraception>(
+            // Tocar o que já está marcado volta para "não informado".
+            emptySelectionAllowed: true,
+            showSelectedIcon: false,
+            segments: [
+              segment(Contraception.com, l10n.contraceptionWith, l10n.contraceptionWithLabel),
+              segment(
+                Contraception.sem,
+                l10n.contraceptionWithout,
+                l10n.contraceptionWithoutLabel,
+              ),
+            ],
+            selected: current == Contraception.naoInformado ? const {} : {current},
+            onSelectionChanged: (selection) => controller.setContraception(
+              date,
+              selection.isEmpty ? Contraception.naoInformado : selection.first,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.contraceptionHint,
+            style: theme.textTheme.bodySmall
+                ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          ),
+        ],
       ),
     );
   }

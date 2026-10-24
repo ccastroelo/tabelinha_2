@@ -55,6 +55,25 @@ class AppLocalizationsEn extends AppLocalizations {
       'Stays on your device only and never shows up in the image you share.';
 
   @override
+  String get contraception => 'Contraception';
+
+  @override
+  String get contraceptionWith => 'Used';
+
+  @override
+  String get contraceptionWithout => 'Not used';
+
+  @override
+  String get contraceptionWithLabel => 'Contraception used';
+
+  @override
+  String get contraceptionWithoutLabel => 'No contraception';
+
+  @override
+  String get contraceptionHint =>
+      'Optional: leave both unselected to say nothing.';
+
+  @override
   String get noPhaseDay => 'Outside your period and fertile window';
 
   @override

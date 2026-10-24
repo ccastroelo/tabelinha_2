@@ -190,6 +190,42 @@ abstract class AppLocalizations {
   /// **'Fica só no seu aparelho e não aparece na imagem que você compartilha.'**
   String get intercourseHint;
 
+  /// No description provided for @contraception.
+  ///
+  /// In pt, this message translates to:
+  /// **'Contraceptivo'**
+  String get contraception;
+
+  /// No description provided for @contraceptionWith.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com'**
+  String get contraceptionWith;
+
+  /// No description provided for @contraceptionWithout.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem'**
+  String get contraceptionWithout;
+
+  /// No description provided for @contraceptionWithLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Com contraceptivo'**
+  String get contraceptionWithLabel;
+
+  /// No description provided for @contraceptionWithoutLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem contraceptivo'**
+  String get contraceptionWithoutLabel;
+
+  /// No description provided for @contraceptionHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Opcional: deixe os dois sem marcar se não quiser informar.'**
+  String get contraceptionHint;
+
   /// No description provided for @noPhaseDay.
   ///
   /// In pt, this message translates to:

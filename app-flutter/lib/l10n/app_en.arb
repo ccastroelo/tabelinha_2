@@ -18,6 +18,12 @@
   "ovulation": "Ovulation",
   "intercourse": "Sex",
   "intercourseHint": "Stays on your device only and never shows up in the image you share.",
+  "contraception": "Contraception",
+  "contraceptionWith": "Used",
+  "contraceptionWithout": "Not used",
+  "contraceptionWithLabel": "Contraception used",
+  "contraceptionWithoutLabel": "No contraception",
+  "contraceptionHint": "Optional: leave both unselected to say nothing.",
   "noPhaseDay": "Outside your period and fertile window",
 
   "yourCycle": "Your cycle",

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/cycle_calculator.dart';
 import '../core/date_only.dart';
 import '../core/reminders.dart';
+import 'intercourse.dart';
 import 'period_record.dart';
 
 /// Persistência local. Tudo cabe em `shared_preferences`: três números, uma
@@ -30,6 +31,7 @@ class CycleRepository {
   static const _kTermsAcceptedAt = 'termsAcceptedAt';
   static const _kRecords = 'periodRecords';
   static const _kIntercourse = 'intercourseDates';
+  static const _kIntercourseLog = 'intercourseLog';
   static const _kLegacyImported = 'legacyImported';
 
   static Future<CycleRepository> open() async =>
@@ -97,18 +99,41 @@ class CycleRepository {
     }
   }
 
-  /// Os dias marcados com relação sexual, como datas de calendário. Ficam fora de
-  /// [PeriodRecord] de propósito: não são uma menstruação, não entram no cálculo do ciclo
-  /// e nenhum outro dado depende deles — guardar à parte deixa apagar só isso.
-  Set<DateTime> loadIntercourseDates() {
-    final raw = _prefs.getStringList(_kIntercourse);
-    if (raw == null) return {};
-    return raw.map(tryParseIsoDate).whereType<DateTime>().toSet();
+  /// Os dias marcados com relação sexual, cada um com o que a pessoa informou sobre
+  /// contraceptivo. Ficam fora de [PeriodRecord] de propósito: não são uma menstruação, não
+  /// entram no cálculo do ciclo e nenhum outro dado depende deles — guardar à parte deixa
+  /// apagar só isso.
+  Map<DateTime, Contraception> loadIntercourse() {
+    final raw = _prefs.getString(_kIntercourseLog);
+    if (raw != null) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) {
+          return {
+            for (final entry in decoded.entries)
+              ?tryParseIsoDate(entry.key as String): Contraception.fromId(entry.value),
+          };
+        }
+      } on FormatException catch (e) {
+        debugPrint('Dias de relação ilegíveis, ignorando: $e');
+      }
+      return {};
+    }
+
+    // A primeira versão guardava só as datas, sem contraceptivo: elas entram como não informado.
+    final dates = _prefs.getStringList(_kIntercourse);
+    if (dates == null) return {};
+    return {
+      for (final date in dates) ?tryParseIsoDate(date): Contraception.naoInformado,
+    };
   }
 
-  Future<void> saveIntercourseDates(Set<DateTime> dates) {
-    final sorted = dates.map(toIsoDate).toList()..sort();
-    return _prefs.setStringList(_kIntercourse, sorted);
+  Future<void> saveIntercourse(Map<DateTime, Contraception> log) {
+    final keys = log.keys.map(toIsoDate).toList()..sort();
+    return _prefs.setString(
+      _kIntercourseLog,
+      jsonEncode({for (final key in keys) key: log[tryParseIsoDate(key)!]!.id}),
+    );
   }
 
   bool get legacyImported => _prefs.getBool(_kLegacyImported) ?? false;
